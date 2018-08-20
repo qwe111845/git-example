@@ -1,0 +1,1116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+        <Timeline enable="0">
+            <BehaviorLayer name="behavior_layer1">
+                <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                        <Box name="record transport" id="1" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="534" y="61">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import socket
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self,p):
+        #self.onStopped() #activate the output of the box
+
+        port = 5007
+
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(("140.134.26.200", port))
+            s.recv(1024)
+            s.send(b'begin to send')
+            self.logger.info('sending, please wait for a second ...')
+
+            with open(p, 'rb') as f:
+                for data in f:
+                    s.send(data)
+                self.logger.info('sended !')
+
+            s.close()
+            self.logger.info('connection closed')
+
+        finally:
+            try:
+                s.close()
+                self.onStopped() # activate output of the box
+            except:
+                pass
+
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Internet Connection" id="2" localization="8" tooltip="This box detects when the robot is connected or disconnected to the Internet." x="135" y="72">
+                            <bitmap>media/images/box/internet/internet.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import socket
+import time
+import urllib2
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.bConnected = None
+
+    def onUnload(self):
+        self.bMustStop = True
+
+    def onInput_onStart(self):
+        if( self.bIsRunning ):
+            return
+        self.bIsRunning = True
+        self.bMustStop = False
+        previousTimeout = socket.getdefaulttimeout()
+        while( not self.bMustStop ):
+            nTimeout = self.getParameter("Time to refresh (s)")
+            tempReqs = self.getParameter("URLs").split(';')
+            reqs = []
+            for tempReq in tempReqs:
+                reqs.append(tempReq.strip(" \n"))
+            socket.setdefaulttimeout(nTimeout * 1. / len(reqs))
+            bOk = False
+            for req in reqs:
+                try:
+                    urllib2.urlopen(req)
+                    bOk = True
+                    break
+                except:
+                    pass
+            if( self.bConnected == None ):
+                self.bConnected = not bOk
+            if( bOk and not self.bConnected ):
+                self.bConnected = True
+                self.connected()
+                time.sleep(nTimeout)
+            if( not bOk and self.bConnected ):
+                self.bConnected = False
+                self.notconnected()
+        socket.setdefaulttimeout(previousTimeout)
+        self.bIsRunning = False
+
+    def onInput_onStop(self):
+        self.onUnload()
+        self.onStopped()]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is stopped." id="4" />
+                            <Output name="connected" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the robot just connected to the Internet." id="5" />
+                            <Output name="notconnected" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the robot has just been disconnected from the Internet." id="6" />
+                            <Parameter name="Time to refresh (s)" inherits_from_parent="0" content_type="1" value="10" default_value="10" min="2" max="60" tooltip="Time ellapsed before checking the connection again." id="7" />
+                            <Parameter name="URLs" inherits_from_parent="0" content_type="3" value="http://aldebaran.com/;https://www.google.com" default_value="http://aldebaran.com/;http://www.google.com" custom_choice="0" tooltip="List of URLs used to check the connection separated by &apos;;&apos;." id="8" />
+                        </Box>
+                        <Box name="Record Sound" id="3" localization="8" tooltip='Record a sound on the robot. You can choose to record only with one&#x0A;microphone (the front head microphone) in ogg format, or with four microphones&#x0A;(front, sides and rear head microphones) in wav format.&#x0A;&#x0A;If &quot;Temporary storage&quot; isn&apos;t checked, the output sound file is located in &quot;~/recordings/microphones/&lt;File name&gt;&quot;.&#x0A;Else, it is located in a temporary directory&#x0A;&#x0A;The onStopped output is stimulated at the end of the recording and contains the absolute path to the output sound file&#x0A;&#x0A;V1.1.0&#x0A;' x="288" y="79">
+                            <bitmap>media/images/box/interaction/rec_sound.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Launches the recording of the sound." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stops the recording of the sound." id="3" />
+                            <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Returns the absolute path of the output sound file at the end of the recording" id="4" />
+                            <Parameter name="File name" inherits_from_parent="0" content_type="3" value="recording" default_value="recording" custom_choice="0" tooltip="Name of the destination file without its extension." id="5" />
+                            <Parameter name="Microphones used" inherits_from_parent="0" content_type="3" value="Front head microphone only (.ogg)" default_value="Front, sides and rear head microphones (.wav)" custom_choice="0" tooltip="Microphones used to record the sound.&#x0A;&#x0A;Note: If you use only the front head microphone the file will be saved in ogg format. If you use the&#x0A;front, sides and rear head microphones it will be saved in wav format." id="6">
+                                <Choice value="Front head microphone only (.ogg)" />
+                                <Choice value="Front, sides and rear head microphones (.wav)" />
+                            </Parameter>
+                            <Parameter name="Temporary storage" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Choose if the file should be stored as a temporary file so it is removed as soon&#x0A;as the behavior is unloaded.&#x0A;&#x0A;When this option is disabled the file is stored in ~/recordings/microphones. You can&#x0A;then get it on your computer using the menu Connection/File transfer.&#x0A;&#x0A;When this option is enabled the file is stored in the temporary folder of the behavior." id="7" />
+                            <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="5" default_value="5" min="0.1" max="60" tooltip="Duration of the recording in seconds." id="8" />
+                            <Timeline enable="0">
+                                <BehaviorLayer name="behavior_layer1">
+                                    <BehaviorKeyframe name="keyframe1" index="1">
+                                        <Diagram>
+                                            <Box name="Rec. Sound File" id="4" localization="8" tooltip="Record a sound on the robot. You can choose to record only with one&#x0A;microphone (the front head microphone) in ogg format, or with four microphones&#x0A;(front, sides and rear head&#x0A;microphones) in wav format." x="562" y="100">
+                                                <bitmap>media/images/box/interaction/rec_sound.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        try:
+            self.ad = ALProxy("ALAudioDevice")
+        except Exception as e:
+            self.ad = None
+            self.logger.error(e)
+        self.filepath = ""
+
+    def onLoad(self):
+        self.bIsRecording = False
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+        if( self.bIsRecording ):
+            self.ad.stopMicrophonesRecording()
+            self.bIsRecording = False
+
+    def onInput_onStart(self, p):
+        if(self.bIsRunning):
+            return
+        self.bIsRunning = True
+        sExtension = self.toExtension( self.getParameter("Microphones used") )
+        self.filepath = p + sExtension
+        if self.ad:
+            self.ad.startMicrophonesRecording( self.filepath )
+            self.bIsRecording = True
+        else:
+            self.logger.warning("No sound recorded")
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped(self.filepath)
+
+    def toExtension(self, sMicrophones):
+        if( sMicrophones == "Front head microphone only (.ogg)" ):
+            return ".ogg"
+        else:
+            return ".wav"]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Launches the recording of the sound. The data received on this input must be the&#x0A;filename of the sound." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stops the recording of the sound." id="3" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Returns the absolute path of the output sound file at the end of the recording" id="4" />
+                                                <Parameter name="Microphones used" inherits_from_parent="1" content_type="3" value="Front, sides and rear head microphones (.wav)" default_value="Front, sides and rear head microphones (.wav)" custom_choice="0" tooltip="Microphones used to record the sound.&#x0A;&#x0A;Note: If you use only the front head microphone the file will be saved in ogg format. If you use the&#x0A;front, sides and rear head microphones it will be saved in wav format." id="5">
+                                                    <Choice value="Front head microphone only (.ogg)" />
+                                                    <Choice value="Front, sides and rear head microphones (.wav)" />
+                                                </Parameter>
+                                            </Box>
+                                            <Box name="Wait" id="13" localization="8" tooltip="Wait a moment before sending a bang on the output. The wait can be stopped any&#x0A;time. You may restart it any time, and it will start over." x="420" y="161">
+                                                <bitmap>media/images/box/wait.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.waiting = None
+
+    def onUnload(self):
+        self.cancelWaiting()
+
+    def triggerOutput(self):
+        self.timerOutput()
+
+    def cancelWaiting(self):
+        if self.waiting:
+            self.waiting.cancel()
+        self.waiting = None
+
+    def onInput_onStart(self):
+        self.cancelWaiting()
+        import qi
+        self.waiting = qi.async(self.triggerOutput, delay=int(self.getParameter("Timeout (s)") * 1000 * 1000))
+
+    def onInput_onStop(self):
+        if self.getParameter("Trigger timerOutput if cancelled") and self.waiting and self.waiting.isRunning():
+            self.timerOutput()
+        self.onUnload()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" />
+                                                <Output name="timerOutput" type="1" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is ellapsed, or if the box is stopped." id="4" />
+                                                <Parameter name="Timeout (s)" inherits_from_parent="1" content_type="2" value="5" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" />
+                                            </Box>
+                                            <Box name="Get File Name" id="10" localization="8" tooltip="Use this box to choose an attached file in its parameters. The filename will be sent on&#x0A;the output when the input is stimulated." x="234" y="95">
+                                                <bitmap>media/images/box/folder.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[import os
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.framemanager = ALProxy("ALFrameManager")
+
+    def onInput_onStart(self):
+        if( self.getParameter("Temporary storage") ):
+            import tempfile
+            path = tempfile.mkdtemp() + "/"
+        else:
+            path = os.path.expanduser('~') + "/recordings/microphones/"
+        self.onStopped( path + self.getParameter("File name") )]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the filepath on the output." id="2" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The filepath of the selected resource file." id="3" />
+                                                <Parameter name="File name" inherits_from_parent="1" content_type="3" value="recording" default_value="" custom_choice="0" tooltip="Name of the file." id="4" />
+                                                <Parameter name="Temporary storage" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="Choose if the file should be stored as a temporary file so it is removed as soon&#x0A;as the behavior is unloaded.&#x0A;&#x0A;When this option is enabled the file is stored in ~/.cache/currentChoregrapheBehavior&#x0A;or in ~/.cache/&lt;project_name&gt; when you play the behavior from the&#x0A;behavior manager.&#x0A;&#x0A;When it is disabled the file is stored in ~/recordedSounds. You can&#x0A;then get it on your computer using the menu Connection/File transfer." id="5" />
+                                            </Box>
+                                            <Link inputowner="0" indexofinput="4" outputowner="4" indexofoutput="4" />
+                                            <Link inputowner="4" indexofinput="3" outputowner="13" indexofoutput="4" />
+                                            <Link inputowner="10" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="13" indexofinput="2" outputowner="10" indexofoutput="3" />
+                                            <Link inputowner="4" indexofinput="2" outputowner="10" indexofoutput="3" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                            </Timeline>
+                            <Resource name="Audio recorder" type="Lock" timeout="0" />
+                        </Box>
+                        <Box name="Take Picture" id="4" localization="8" tooltip="Take a picture with one of the cameras camera and store it in his memory in ~/recordings/cameras. The image format is JPG.&#x0A;&#x0A;V1.1.0&#x0A;" x="96" y="213">
+                            <bitmap>media/images/box/interaction/picture.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        self.resolutionMap = {
+            '160 x 120': 0,
+            '320 x 240': 1,
+            '640 x 480': 2,
+            '1280 x 960': 3
+        }
+        self.cameraMap = {
+            'Top': 0,
+            'Bottom': 1
+        }
+
+        self.recordFolder = "/home/nao/recordings/cameras/"
+
+    def onLoad(self):
+        self.bIsRunning = False
+        try:
+            self.photoCapture = ALProxy( "ALPhotoCapture" )
+        except Exception as e:
+            self.photoCapture = None
+            self.logger.error(e)
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        if( self.bIsRunning ):
+            return
+        self.bIsRunning = True
+        resolution = self.resolutionMap[self.getParameter("Resolution")]
+        cameraID = self.cameraMap[self.getParameter("Camera")]
+        fileName = self.getParameter("File Name")
+        if self.photoCapture:
+            self.photoCapture.setResolution(resolution)
+            self.photoCapture.setCameraID(cameraID)
+            self.photoCapture.setPictureFormat("jpg")
+            self.photoCapture.takePicture( self.recordFolder, fileName )
+        self.bIsRunning = False
+        piture = '/home/nao/recordings/cameras/image.jpg'
+        self.onStopped(piture)]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                            <Parameter name="Resolution" inherits_from_parent="0" content_type="3" value="640 x 480" default_value="640 x 480" custom_choice="0" tooltip="Image resolution." id="4">
+                                <Choice value="160 x 120" />
+                                <Choice value="320 x 240" />
+                                <Choice value="640 x 480" />
+                                <Choice value="1280 x 960" />
+                            </Parameter>
+                            <Parameter name="File Name" inherits_from_parent="0" content_type="3" value="image" default_value="image" custom_choice="0" tooltip="Name of the file without its extension." id="5" />
+                            <Parameter name="Camera" inherits_from_parent="0" content_type="3" value="Top" default_value="Top" custom_choice="0" tooltip="Enables to select the camera (Top or Bottom) that will take the picture." id="6">
+                                <Choice value="Top" />
+                                <Choice value="Bottom" />
+                            </Parameter>
+                        </Box>
+                        <Box name="Learn Face" id="5" localization="8" tooltip="Teach the robot a new face to recognize. the robot&apos;s eyes will become green in case of&#x0A;success and red in case of failure.&#x0A;&#x0A;V1.1.0&#x0A;" x="380" y="241">
+                            <bitmap>media/images/box/interaction/learn_face.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onLearn" type="3" type_size="1" nature="2" inner="0" tooltip="Name of the face you want to learn.&#x0A;&#x0A;After entering the name of the face, you have 5s to place in front of the robot&apos;s face.&#x0A;Then the learning process is launched and the robot&apos;s eyes get blue. After some&#x0A;seconds, his eyes should turn green (success) or red (failure).&#x0A;&#x0A;Note: You can learn several times the same face on different days and/or&#x0A;conditions to robustify the recognition process." id="2" />
+                            <Output name="onSuccess" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent if the learning succeeded." id="3" />
+                            <Output name="onFailure" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent if the learning failed." id="4" />
+                            <Timeline enable="0">
+                                <BehaviorLayer name="behavior_layer1">
+                                    <BehaviorKeyframe name="keyframe1" index="1">
+                                        <Diagram>
+                                            <Box name="Learn Face" id="2" localization="8" tooltip="Learn a face to recognize it later.&#x0A;&#x0A;Note: You need to be just in front of the robot&apos;s face to teach him your face." x="624" y="60">
+                                                <bitmap>media/images/box/interaction/face.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        try:
+            self.faceDetectionModule = ALProxy("ALFaceDetection")
+        except Exception as e:
+            self.faceDetectionModule = None
+            self.logger.error(e)
+
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onLearn(self, p):
+        if( self.bIsRunning ):
+            return
+        self.bIsRunning = True
+        if( self.faceDetectionModule and self.faceDetectionModule.learnFace( p ) ):
+            self.onSuccess()
+        else:
+            self.onFailure()
+        self.bIsRunning = False
+
+    def onInput_onReLearn(self, p):
+        if( self.bIsRunning ):
+            return
+        self.bIsRunning = True
+        if( self.faceDetectionModule and self.faceDetectionModule.reLearnFace( p ) ):
+            self.onSuccess()
+        else:
+            self.onFailure()
+        self.bIsRunning = False]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onLearn" type="3" type_size="1" nature="2" inner="0" tooltip="Name of the face you want to learn." id="2" />
+                                                <Input name="onReLearn" type="3" type_size="1" nature="2" inner="0" tooltip="Name of the face you want to relearn. Stimulating this input enables to use in a&#x0A;new learning process the latest images where a face has been wrongly&#x0A;recognized." id="3" />
+                                                <Output name="onSuccess" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent if the operation succeeded. The face has been learnt." id="4" />
+                                                <Output name="onFailure" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent if the operation failed. The face has not been learnt." id="5" />
+                                            </Box>
+                                            <Box name="WaitToSendMsg" id="8" localization="8" tooltip="Wait for both inputs to be stimulated before sending the message." x="464" y="32">
+                                                <bitmap>media/images/box/box-script.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.ok1 = None
+        self.ok2 = False
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        ""
+
+    def onInput_onMessage(self, p):
+        if( not self.ok2 ):
+            self.ok1 = p
+        else:
+            self.ok( p )
+
+    def onInput_onSignal(self):
+        if( self.ok1 == None ):
+            self.ok2 = True
+        else:
+            self.ok( self.ok1 )
+
+    def ok(self, p):
+        self.ok1 = None
+        self.ok2 = False
+        self.onStopped( p )]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                                <Input name="onMessage" type="0" type_size="1" nature="2" inner="0" tooltip="First signal to wait. This signal contains the message to transmit." id="2" />
+                                                <Input name="onSignal" type="1" type_size="1" nature="2" inner="0" tooltip="Second signal to wait." id="3" />
+                                                <Output name="onStopped" type="0" type_size="1" nature="1" inner="0" tooltip="Message sent when both inputs are stimulated." id="4" />
+                                            </Box>
+                                            <Box name="Only Once" id="9" localization="8" tooltip="This box&apos;s output is stimulated only the first time the onSignal input is." x="71" y="37">
+                                                <bitmap>media/images/box/box-script.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bFirstTime = True
+
+    def onUnload(self):
+        self.bFirstTime = True
+
+    def onInput_onSignal(self, p):
+        if( self.bFirstTime ):
+            self.bFirstTime = False
+            self.firstTime(p)]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onSignal" type="0" type_size="1" nature="1" inner="0" tooltip="The signal that must pass only once." id="2" />
+                                                <Output name="firstTime" type="0" type_size="1" nature="2" inner="0" tooltip="Signal sent first time the onSignal input is stimulated." id="3" />
+                                            </Box>
+                                            <Box name="Eyes LEDs" id="5" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes. Note that you must enter the box to enter the color." x="776" y="12">
+                                                <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                <Parameter name="Side" inherits_from_parent="0" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                    <Choice value="Both" />
+                                                    <Choice value="Left" />
+                                                    <Choice value="Right" />
+                                                </Parameter>
+                                                <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="0.01" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                <Timeline enable="0">
+                                                    <BehaviorLayer name="behavior_layer1">
+                                                        <BehaviorKeyframe name="keyframe1" index="1">
+                                                            <Diagram>
+                                                                <Box name="Eyes LEDs" id="15" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes." x="281" y="41">
+                                                                    <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.ids = []
+        self.leds = ALProxy("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_color(self, p):
+        if( self.getParameter("Side") == "Left" ):
+            sGroup = "LeftFaceLeds"
+        elif( self.getParameter("Side") == "Right" ):
+            sGroup = "RightFaceLeds"
+        else:
+            sGroup = "FaceLeds"
+        id = self.leds.post.fadeRGB(sGroup, 256*256*p[0] + 256*p[1] + p[2], self.getParameter("Duration (s)"))
+        self.ids.append(id)
+        self.leds.wait(id, 0)
+        self.ids.remove(id)
+        if( self.ids == [] ):
+            self.onDone() # activate output of the box]]>
+</content>
+                                                                    </script>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="color" type="2" type_size="3" nature="2" inner="0" tooltip="Color of robot&apos;s eyes." id="2" />
+                                                                    <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                                    <Parameter name="Side" inherits_from_parent="1" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                                        <Choice value="Both" />
+                                                                        <Choice value="Left" />
+                                                                        <Choice value="Right" />
+                                                                    </Parameter>
+                                                                    <Parameter name="Duration (s)" inherits_from_parent="1" content_type="2" value="0.1" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                                </Box>
+                                                                <Box name="Color Edit" id="16" localization="8" tooltip="Transmit a table of number [R,G,B] correponsding to the selected color." plugin="coloredit_plugin" x="105" y="47">
+                                                                    <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped([0, 255, 0])]]>
+</content>
+                                                                    </script>
+                                                                    <pluginContent>
+                                                                        <color>#00ff00</color>
+                                                                    </pluginContent>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="To send the color on the output." id="2" />
+                                                                    <Output name="onStopped" type="2" type_size="3" nature="1" inner="0" tooltip="[R,G,B] with R, G and B between 0 and 255." id="3" />
+                                                                </Box>
+                                                                <Link inputowner="15" indexofinput="2" outputowner="16" indexofoutput="3" />
+                                                                <Link inputowner="16" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                                                <Link inputowner="0" indexofinput="3" outputowner="15" indexofoutput="3" />
+                                                            </Diagram>
+                                                        </BehaviorKeyframe>
+                                                    </BehaviorLayer>
+                                                </Timeline>
+                                            </Box>
+                                            <Box name="Eyes LEDs" id="6" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes. Note that you must enter the box to enter the color." x="776" y="114">
+                                                <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                <Parameter name="Side" inherits_from_parent="0" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                    <Choice value="Both" />
+                                                    <Choice value="Left" />
+                                                    <Choice value="Right" />
+                                                </Parameter>
+                                                <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="0.01" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                <Timeline enable="0">
+                                                    <BehaviorLayer name="behavior_layer1">
+                                                        <BehaviorKeyframe name="keyframe1" index="1">
+                                                            <Diagram>
+                                                                <Box name="Eyes LEDs" id="15" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes." x="281" y="41">
+                                                                    <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.ids = []
+        self.leds = ALProxy("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_color(self, p):
+        if( self.getParameter("Side") == "Left" ):
+            sGroup = "LeftFaceLeds"
+        elif( self.getParameter("Side") == "Right" ):
+            sGroup = "RightFaceLeds"
+        else:
+            sGroup = "FaceLeds"
+        id = self.leds.post.fadeRGB(sGroup, 256*256*p[0] + 256*p[1] + p[2], self.getParameter("Duration (s)"))
+        self.ids.append(id)
+        self.leds.wait(id, 0)
+        self.ids.remove(id)
+        if( self.ids == [] ):
+            self.onDone() # activate output of the box]]>
+</content>
+                                                                    </script>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="color" type="2" type_size="3" nature="2" inner="0" tooltip="Color of robot&apos;s eyes." id="2" />
+                                                                    <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                                    <Parameter name="Side" inherits_from_parent="1" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                                        <Choice value="Both" />
+                                                                        <Choice value="Left" />
+                                                                        <Choice value="Right" />
+                                                                    </Parameter>
+                                                                    <Parameter name="Duration (s)" inherits_from_parent="1" content_type="2" value="0.1" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                                </Box>
+                                                                <Box name="Color Edit" id="16" localization="8" tooltip="Transmit a table of number [R,G,B] correponsding to the selected color." plugin="coloredit_plugin" x="105" y="47">
+                                                                    <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped([255, 0, 0])]]>
+</content>
+                                                                    </script>
+                                                                    <pluginContent>
+                                                                        <color>#ff0000</color>
+                                                                    </pluginContent>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="To send the color on the output." id="2" />
+                                                                    <Output name="onStopped" type="2" type_size="3" nature="1" inner="0" tooltip="[R,G,B] with R, G and B between 0 and 255." id="3" />
+                                                                </Box>
+                                                                <Link inputowner="15" indexofinput="2" outputowner="16" indexofoutput="3" />
+                                                                <Link inputowner="16" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                                                <Link inputowner="0" indexofinput="3" outputowner="15" indexofoutput="3" />
+                                                            </Diagram>
+                                                        </BehaviorKeyframe>
+                                                    </BehaviorLayer>
+                                                </Timeline>
+                                            </Box>
+                                            <Box name="Eyes LEDs" id="1" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes. Note that you must enter the box to enter the color." x="330" y="122">
+                                                <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                <Parameter name="Side" inherits_from_parent="0" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                    <Choice value="Both" />
+                                                    <Choice value="Left" />
+                                                    <Choice value="Right" />
+                                                </Parameter>
+                                                <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="0.01" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                <Timeline enable="0">
+                                                    <BehaviorLayer name="behavior_layer1">
+                                                        <BehaviorKeyframe name="keyframe1" index="1">
+                                                            <Diagram>
+                                                                <Box name="Eyes LEDs" id="15" localization="8" tooltip="Set the color of LEDs of robot&apos;s eyes." x="281" y="41">
+                                                                    <bitmap>media/images/box/interaction/LED.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.ids = []
+        self.leds = ALProxy("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_color(self, p):
+        if( self.getParameter("Side") == "Left" ):
+            sGroup = "LeftFaceLeds"
+        elif( self.getParameter("Side") == "Right" ):
+            sGroup = "RightFaceLeds"
+        else:
+            sGroup = "FaceLeds"
+        id = self.leds.post.fadeRGB(sGroup, 256*256*p[0] + 256*p[1] + p[2], self.getParameter("Duration (s)"))
+        self.ids.append(id)
+        self.leds.wait(id, 0)
+        self.ids.remove(id)
+        if( self.ids == [] ):
+            self.onDone() # activate output of the box]]>
+</content>
+                                                                    </script>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="color" type="2" type_size="3" nature="2" inner="0" tooltip="Color of robot&apos;s eyes." id="2" />
+                                                                    <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                                                    <Parameter name="Side" inherits_from_parent="1" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the eye where the LED light is set." id="4">
+                                                                        <Choice value="Both" />
+                                                                        <Choice value="Left" />
+                                                                        <Choice value="Right" />
+                                                                    </Parameter>
+                                                                    <Parameter name="Duration (s)" inherits_from_parent="1" content_type="2" value="0.1" default_value="0.1" min="0" max="5" tooltip="Transition&apos;s duration in seconds." id="5" />
+                                                                </Box>
+                                                                <Box name="Color Edit" id="16" localization="8" tooltip="Transmit a table of number [R,G,B] correponsding to the selected color." plugin="coloredit_plugin" x="105" y="47">
+                                                                    <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped([0, 170, 255])]]>
+</content>
+                                                                    </script>
+                                                                    <pluginContent>
+                                                                        <color>#00aaff</color>
+                                                                    </pluginContent>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="To send the color on the output." id="2" />
+                                                                    <Output name="onStopped" type="2" type_size="3" nature="1" inner="0" tooltip="[R,G,B] with R, G and B between 0 and 255." id="3" />
+                                                                </Box>
+                                                                <Link inputowner="15" indexofinput="2" outputowner="16" indexofoutput="3" />
+                                                                <Link inputowner="16" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                                                <Link inputowner="0" indexofinput="3" outputowner="15" indexofoutput="3" />
+                                                            </Diagram>
+                                                        </BehaviorKeyframe>
+                                                    </BehaviorLayer>
+                                                </Timeline>
+                                            </Box>
+                                            <Box name="Wait" id="3" localization="8" tooltip="Wait a moment before sending a signal on the output. &#x0A;Can be stopped anytime. &#x0A;Stimulating the input again before output is activated restarts the waiting period.&#x0A;" x="200" y="95">
+                                                <bitmap>media/images/box/wait.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.waiting = None
+
+    def onUnload(self):
+        self.cancelWaiting()
+
+    def triggerOutput(self):
+        self.timerOutput()
+
+    def cancelWaiting(self):
+        if self.waiting:
+            self.waiting.cancel()
+        self.waiting = None
+
+    def onInput_onStart(self):
+        self.cancelWaiting()
+        import qi
+        self.waiting = qi.async(self.triggerOutput, delay=int(self.getParameter("Timeout (s)") * 1000 * 1000))
+
+    def onInput_onStop(self):
+        if self.getParameter("Trigger timerOutput if cancelled") and self.waiting and self.waiting.isRunning():
+            self.timerOutput()
+        self.onUnload()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" />
+                                                <Output name="timerOutput" type="1" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is elapsed, or if the box is stopped." id="4" />
+                                                <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="5" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" />
+                                                <Parameter name="Trigger timerOutput if cancelled" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="If the box is currently waiting and cancelled, output will be stimulated." id="6" />
+                                            </Box>
+                                            <Link inputowner="2" indexofinput="2" outputowner="8" indexofoutput="4" />
+                                            <Link inputowner="9" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="8" indexofinput="2" outputowner="9" indexofoutput="3" />
+                                            <Link inputowner="5" indexofinput="2" outputowner="2" indexofoutput="4" />
+                                            <Link inputowner="6" indexofinput="2" outputowner="2" indexofoutput="5" />
+                                            <Link inputowner="0" indexofinput="3" outputowner="5" indexofoutput="3" />
+                                            <Link inputowner="0" indexofinput="4" outputowner="6" indexofoutput="3" />
+                                            <Link inputowner="3" indexofinput="2" outputowner="9" indexofoutput="3" />
+                                            <Link inputowner="1" indexofinput="2" outputowner="3" indexofoutput="4" />
+                                            <Link inputowner="8" indexofinput="3" outputowner="3" indexofoutput="4" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                            </Timeline>
+                        </Box>
+                        <Box name="Record Video" id="6" localization="8" tooltip="Record a video from one of the cameras. Stop recording when the duration set in parameter is elapsed. Note: By default, the file will be stored on the robot in /home/nao/recordings/cameras.&#x0A;&#x0A;V1.1.0&#x0A;" x="265" y="408">
+                            <bitmap>media/images/box/interaction/rec_movie.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Parameter name="File name" inherits_from_parent="0" content_type="3" value="recording" default_value="recording" custom_choice="0" tooltip="Name of the destination file without its extension." id="5" />
+                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="5" default_value="10" min="0.01" max="120" tooltip="Duration of the video capture." id="6" />
+                            <Parameter name="Resolution" inherits_from_parent="0" content_type="3" value="640 x 480" default_value="320 x 240" custom_choice="0" tooltip="Recording resolution." id="7">
+                                <Choice value="160 x 120" />
+                                <Choice value="320 x 240" />
+                                <Choice value="640 x 480" />
+                            </Parameter>
+                            <Parameter name="Frame rate (frame/s)" inherits_from_parent="0" content_type="1" value="30" default_value="10" min="1" max="30" tooltip="Recording frame rate.&#x0A;&#x0A;!Warning! MJPG format requires framerate greater than 2.0." id="8" />
+                            <Parameter name="Format" inherits_from_parent="0" content_type="3" value="MJPG" default_value="MJPG" custom_choice="0" tooltip="Recording format:&#x0A;- IYUV for raw avi.&#x0A;- MJPG for compressed avi." id="9">
+                                <Choice value="IYUV" />
+                                <Choice value="MJPG" />
+                            </Parameter>
+                            <Parameter name="Camera" inherits_from_parent="0" content_type="3" value="Top" default_value="Top" custom_choice="0" tooltip='Enable to select the camera that will record the video.&#x0A;It is possible to select the Top camera, the Bottom camera or the &quot;Default&quot; camera, which corresponds to the one displayed in the Video monitor and which can be changed with the &quot;Select Camera&quot; box.' id="10">
+                                <Choice value="Top" />
+                                <Choice value="Bottom" />
+                            </Parameter>
+                            <Timeline enable="0">
+                                <BehaviorLayer name="behavior_layer1">
+                                    <BehaviorKeyframe name="keyframe1" index="1">
+                                        <Diagram>
+                                            <Box name="Record Video" id="4" localization="8" tooltip="Record a video from one of the cameras. Stop recording when the onStop intput is&#x0A;stimulated.&#x0A;&#x0A;Note: By default, the file will be stored on the robot in /home/nao." x="564" y="10">
+                                                <bitmap>media/images/box/interaction/rec_movie.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.resolutionMap = {
+            '160 x 120': 0,
+            '320 x 240': 1,
+            '640 x 480': 2
+        }
+        self.cameraMap = {
+            'Top': 0,
+            'Bottom': 1
+        }
+        self.recordFolder = "/home/nao/recordings/cameras/"
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        try:
+            self.videoRecorder = ALProxy("ALVideoRecorder")
+        except Exception as e:
+            self.videoRecorder = None
+            self.logger.error(e)
+
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        if( self.videoRecorder and self.videoRecorder.isRecording() ):
+            self.videoRecorder.stopRecording()
+
+    def onInput_onStart(self):
+        resolutionValue = self.resolutionMap[self.getParameter("Resolution")]
+        cameraID = self.cameraMap[self.getParameter("Camera")]
+        formatValue = str(self.getParameter("Format"))
+        frameRateValue = self.getParameter("Frame rate (frame/s)")
+        fileName = self.getParameter("File name")
+        if self.videoRecorder:
+            self.videoRecorder.setResolution(resolutionValue)
+            self.videoRecorder.setCameraID(cameraID)
+            self.videoRecorder.setVideoFormat(formatValue)
+            self.videoRecorder.setFrameRate(frameRateValue)
+
+            self.videoRecorder.startRecording(self.recordFolder, fileName)
+
+    def onInput_onStop(self):
+        self.onUnload()
+        self.onStopped('/home/nao/recordings/cameras/recording')]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                                                <Parameter name="File name" inherits_from_parent="1" content_type="3" value="recording" default_value="recording" custom_choice="0" tooltip="Name of the destination file without its extension." id="5" />
+                                                <Parameter name="Resolution" inherits_from_parent="1" content_type="3" value="320 x 240" default_value="320 x 240" custom_choice="0" tooltip="Recording resolution." id="6">
+                                                    <Choice value="160 x 120" />
+                                                    <Choice value="320 x 240" />
+                                                    <Choice value="640 x 480" />
+                                                </Parameter>
+                                                <Parameter name="Frame rate (frame/s)" inherits_from_parent="1" content_type="1" value="10" default_value="10" min="1" max="30" tooltip="Recording frame rate.&#x0A;&#x0A;!Warning! MJPG format requires framerate greater than 2.0." id="7" />
+                                                <Parameter name="Format" inherits_from_parent="1" content_type="3" value="MJPG" default_value="MJPG" custom_choice="0" tooltip="Recording format:&#x0A;- ARV for raw YUV422 format.&#x0A;- IYUV for raw avi.&#x0A;- MJPG for compressed avi." id="8">
+                                                    <Choice value="ARV" />
+                                                    <Choice value="IYUV" />
+                                                    <Choice value="MJPG" />
+                                                </Parameter>
+                                                <Parameter name="Camera" inherits_from_parent="1" content_type="3" value="Top" default_value="Top" custom_choice="0" tooltip='Enable to select the camera that will record the video.&#x0A;It is possible to select the Top camera, the Bottom camera or the &quot;Default&quot; camera, which corresponds to the one displayed in the Video monitor and which can be changed with the &quot;Select Camera&quot; box.' id="9">
+                                                    <Choice value="Top" />
+                                                    <Choice value="Bottom" />
+                                                </Parameter>
+                                            </Box>
+                                            <Box name="Wait" id="5" localization="8" tooltip="Wait a moment before sending a signal on the output. &#x0A;Can be stopped anytime. &#x0A;Stimulating the input again before output is activated restarts the waiting period.&#x0A;" x="226" y="68">
+                                                <bitmap>media/images/box/wait.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.waiting = None
+
+    def onUnload(self):
+        self.cancelWaiting()
+
+    def triggerOutput(self):
+        self.timerOutput()
+
+    def cancelWaiting(self):
+        if self.waiting:
+            self.waiting.cancel()
+        self.waiting = None
+
+    def onInput_onStart(self):
+        self.cancelWaiting()
+        import qi
+        self.waiting = qi.async(self.triggerOutput, delay=int(self.getParameter("Duration (s)") * 1000 * 1000))
+
+    def onInput_onStop(self):
+        if self.getParameter("Trigger timerOutput if cancelled") and self.waiting and self.waiting.isRunning():
+            self.timerOutput()
+        self.onUnload()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" />
+                                                <Output name="timerOutput" type="1" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is elapsed, or if the box is stopped and the appropriate parameter is set." id="4" />
+                                                <Parameter name="Duration (s)" inherits_from_parent="1" content_type="2" value="1" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" />
+                                                <Parameter name="Trigger timerOutput if cancelled" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="If the box is currently waiting and cancelled, output will be stimulated." id="6" />
+                                            </Box>
+                                            <Link inputowner="4" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="4" indexofinput="3" outputowner="5" indexofoutput="4" />
+                                            <Link inputowner="0" indexofinput="4" outputowner="4" indexofoutput="4" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                            </Timeline>
+                        </Box>
+                        <Box name="Vision Reco." id="7" localization="8" tooltip="Recognize pictures, objects and locations which are known by the robot.&#x0A;&#x0A;Note: the robot needs to learn the picture, object or location to be able to recognize&#x0A;it. The learning process can be done through the Video Monitor (in Choregraphe&#x0A;menu, click on View, then Video Monitor)." x="527" y="453">
+                            <bitmap>media/images/box/interaction/reco.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        self.bIsRunning = True
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is stopped." id="4" />
+                            <Output name="onPictureLabel" type="3" type_size="1" nature="2" inner="0" tooltip="Every time pictures/objects/locations are recognized, send the first picture recognized." id="5" />
+                            <Output name="onNoPicture" type="1" type_size="1" nature="2" inner="0" tooltip="No picture, object or location has been recognized." id="6" />
+                            <Timeline enable="0">
+                                <BehaviorLayer name="behavior_layer1">
+                                    <BehaviorKeyframe name="keyframe1" index="1">
+                                        <Diagram>
+                                            <Box name="Vision Reco." id="1" localization="8" tooltip="Recognize pictures, objects and locations which are already known by the robot.&#x0A;&#x0A;Note: the robot needs to learn the picture, object or location to be able to recognize&#x0A;it. The learning process can be done through the Video Monitor (in Choregraphe&#x0A;menu, click on View, then Video Monitor)." x="95" y="161">
+                                                <bitmap>media/images/box/interaction/reco.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        self.bIsRunning = True
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                                                <Input name="PictureDetected" type="0" type_size="1" nature="4" stm_value_name="PictureDetected" inner="1" tooltip="Connected to ALMemory. Will be stimulated every time the value subscribed to changes, respecting the refresh period." id="4" />
+                                                <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
+                                                <Output name="onPictureLabel" type="0" type_size="1" nature="2" inner="0" tooltip="Every time pictures/objects/locations are recognized, send the result as&#x0A;[Picture_1, ..., Picture_N], with Picture_n = [label1,...,label_M]." id="6" />
+                                                <Output name="onNoPicture" type="1" type_size="1" nature="2" inner="0" tooltip="No picture, object or location has been recognized." id="7" />
+                                                <Timeline enable="0">
+                                                    <BehaviorLayer name="behavior_layer1">
+                                                        <BehaviorKeyframe name="keyframe1" index="1">
+                                                            <Diagram>
+                                                                <Box name="Process Reco." id="3" localization="8" tooltip="Process picture detection extractor data (PictureDetected) to extract the labels of&#x0A;recognized pictures, objects and locations, and notify when there is nothing&#x0A;of these recognized.&#x0A;&#x0A;An output (either one or the other) is stimulated each time the recognized&#x0A;pictures, objects and locations change." x="188" y="60">
+                                                                    <bitmap>media/images/box/interaction/reco.png</bitmap>
+                                                                    <script language="4">
+                                                                        <content>
+                                                                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.nPicturesDetected = -1
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self, p):
+        if(len(p) > 1):
+            self.nPicturesDetected = len(p[1])
+            labels = []
+            for s in p[1]:
+                labels.append(s[0])
+            self.onPictureLabel( labels )
+        else:
+            if(self.nPicturesDetected != 0):
+                self.nPicturesDetected = 0
+                self.onNoPicture()]]>
+</content>
+                                                                    </script>
+                                                                    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                                    <Input name="onStart" type="0" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input. It must be the&#x0A;PictureDetected extractor data." id="2" />
+                                                                    <Output name="onPictureLabel" type="0" type_size="1" nature="1" inner="0" tooltip="List of recognized pictures, objects and locations labels. It is sent regularly as&#x0A;long as they are recognized.&#x0A;&#x0A;For example, you could obtain this kind of result:&#x0A;[[&apos;cover&apos;, &apos;my book&apos;], [&apos;fridge corner&apos;, &apos;kitchen&apos;, &apos;my flat&apos;]]" id="3" />
+                                                                    <Output name="onNoPicture" type="1" type_size="1" nature="1" inner="0" tooltip="No picture, object or location is recognized." id="4" />
+                                                                </Box>
+                                                                <Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="4" />
+                                                                <Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="3" />
+                                                                <Link inputowner="0" indexofinput="7" outputowner="3" indexofoutput="4" />
+                                                            </Diagram>
+                                                        </BehaviorKeyframe>
+                                                    </BehaviorLayer>
+                                                </Timeline>
+                                            </Box>
+                                            <Box name="ConvertIntoStrings" id="3" localization="8" tooltip='Convert the array of recognized objects into several strings sent one after another.&#x0A;&#x0A;For example, if the array is:&#x0A;[[&quot;page 3&quot;, &quot;Harry Potter&quot;], [&quot;bed&quot;, &quot;bedroom&quot;, &quot;home&quot;]]&#x0A;Then the output will be stimulated first with:&#x0A;&quot;Harry Potter page 3&quot;&#x0A;And then with:&#x0A;&quot;home bedroom bed&quot;' x="285" y="49">
+                                                <bitmap>media/images/box/box-script.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        pass
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self, p):
+        for element in p:
+            element.reverse()
+            newElement = ""
+            for i in range(len(element)-1):
+                newElement += str(element[i]) + " "
+            if( len(element) > 0 ):
+                newElement += str(element[len(element)-1])
+            self.onStopped( newElement )
+            self.logger.info( newElement )]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="0" type_size="1" nature="1" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                                            </Box>
+                                            <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="0" indexofinput="6" outputowner="1" indexofoutput="7" />
+                                            <Link inputowner="3" indexofinput="2" outputowner="1" indexofoutput="6" />
+                                            <Link inputowner="0" indexofinput="5" outputowner="3" indexofoutput="3" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                            </Timeline>
+                        </Box>
+                        <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="4" />
+                        <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Link inputowner="3" indexofinput="2" outputowner="2" indexofoutput="5" />
+                        <Link inputowner="1" indexofinput="2" outputowner="3" indexofoutput="4" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+        </Timeline>
+    </Box>
+</ChoregrapheProject>

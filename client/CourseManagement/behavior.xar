@@ -1331,12 +1331,12 @@ class MyClass(GeneratedClass):
     def onInput_startBehavior(self, p):
         bm = ALProxy("ALBehaviorManager")
         bm.startBehavior(p)
-        self.onBehaviorStarted(p) #~ activate output of the box]]>
+        self.onBehaviorStarted() #~ activate output of the box]]>
 </content>
                             </script>
                             <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                             <Input name="startBehavior" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
-                            <Output name="onBehaviorStarted" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished. Recalls the behavior name." id="3" />
+                            <Output name="onBehaviorStarted" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished. Recalls the behavior name." id="3" />
                             <Output name="onError" type="3" type_size="1" nature="1" inner="0" tooltip="Triggered if an error occurs at behavior start." id="4" />
                         </Box>
                         <Link inputowner="8" indexofinput="2" outputowner="2" indexofoutput="4" />

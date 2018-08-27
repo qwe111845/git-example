@@ -1137,7 +1137,7 @@ class MyClass(GeneratedClass):
                                                 <Parameter name="File name" inherits_from_parent="1" content_type="3" value="recording" default_value="" custom_choice="0" tooltip="Name of the file." id="4" />
                                                 <Parameter name="Temporary storage" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="Choose if the file should be stored as a temporary file so it is removed as soon&#x0A;as the behavior is unloaded.&#x0A;&#x0A;When this option is enabled the file is stored in ~/.cache/currentChoregrapheBehavior&#x0A;or in ~/.cache/&lt;project_name&gt; when you play the behavior from the&#x0A;behavior manager.&#x0A;&#x0A;When it is disabled the file is stored in ~/recordedSounds. You can&#x0A;then get it on your computer using the menu Connection/File transfer." id="5" />
                                             </Box>
-                                            <Box name="Python Script" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="903" y="231">
+                                            <Box name="Python Script" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="872" y="237">
                                                 <bitmap>media/images/box/box-python-script.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -1167,7 +1167,7 @@ class MyClass(GeneratedClass):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('140.134.26.200', port))
 
-        self.talk('抓取資料中')
+        self.say('抓取資料中')
         s.send('所有課程')
 
         class_data = s.recv(2048)
@@ -1176,7 +1176,7 @@ class MyClass(GeneratedClass):
         if self.class_names[len(self.class_names)-1] == '':
             del self.class_names[len(self.class_names)-1]
 
-        self.talk('完成')
+        self.say('完成')
 
         self.onStopped() #activate the output of the box
 
@@ -1186,18 +1186,18 @@ class MyClass(GeneratedClass):
         for i in self.class_names:
             if p == i:
                 have_class = True
-                self.talk('找到課程')
+                self.say('找到課程')
                 self.get_class(p)
 
         if have_class == False:
             self.Course_not_found('查無此課程 麻煩再說一遍')
 
 
-    def talk(self,p):
+    def say(self,p, RSPD = 100 , VCT = 100):
         self.bIsRunning = True
         try:
-            sentence = "\RSPD="+ str( 100 ) + "\ "
-            sentence += "\VCT="+ str( 100 ) + "\ "
+            sentence = "\RSPD="+ str( RSPD ) + "\ "
+            sentence += "\VCT="+ str( VCT ) + "\ "
             sentence += str(p)
             sentence +=  "\RST\ "
             id = self.animSpeech.post.say(str(sentence))
@@ -1428,7 +1428,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>11</language>
+                                                                        <language>13</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />

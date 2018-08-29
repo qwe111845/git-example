@@ -10,7 +10,11 @@
         <BehaviorDescription name="behavior" src="Course" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
-    <Resources />
+    <Resources>
+        <File name="NaoAnimateSay" src="NaoAnimateSay.py" />
+        <File name="logger" src="logger.py" />
+        <File name="choice_sentences" src="Course/Aldebaran/choice_sentences.xml" />
+    </Resources>
     <Topics />
     <IgnoredPaths />
 </Package>

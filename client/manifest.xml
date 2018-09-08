@@ -10,7 +10,7 @@
   <language>en_US</language>
  </descriptionLanguages>
  <contents>
-  <behaviorContent path="client">
+  <behaviorContent path="FileTransfer">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
@@ -31,6 +31,18 @@
    <permissions/>
   </behaviorContent>
   <behaviorContent path="Course">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="ChatBot">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Conversation">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Model">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>

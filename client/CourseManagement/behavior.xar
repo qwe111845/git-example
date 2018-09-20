@@ -242,7 +242,7 @@ class MyClass(GeneratedClass):
                                                 </Timeline>
                                                 <Resource name="Speech" type="Lock" timeout="0" />
                                             </Box>
-                                            <Box name="Say Text" id="1" localization="8" tooltip="Say the text received on its input." x="1080" y="102">
+                                            <Box name="Say Text" id="1" localization="8" tooltip="Say the text received on its input." x="1115" y="113">
                                                 <bitmap>media/images/box/interaction/say.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -1270,7 +1270,7 @@ class MyClass(GeneratedClass):
                                                 <Parameter name="File name" inherits_from_parent="1" content_type="3" value="recording" default_value="" custom_choice="0" tooltip="Name of the file." id="4" />
                                                 <Parameter name="Temporary storage" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="Choose if the file should be stored as a temporary file so it is removed as soon&#x0A;as the behavior is unloaded.&#x0A;&#x0A;When this option is enabled the file is stored in ~/.cache/currentChoregrapheBehavior&#x0A;or in ~/.cache/&lt;project_name&gt; when you play the behavior from the&#x0A;behavior manager.&#x0A;&#x0A;When it is disabled the file is stored in ~/recordedSounds. You can&#x0A;then get it on your computer using the menu Connection/File transfer." id="5" />
                                             </Box>
-                                            <Box name="get_classwork" id="3" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="1054" y="239">
+                                            <Box name="get_classwork" id="3" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="1035" y="249">
                                                 <bitmap>media/images/box/box-python-script.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -1317,7 +1317,7 @@ class MyClass(GeneratedClass):
                                                 <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                                                 <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                                             </Box>
-                                            <Box name="Set ID" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="535" y="404">
+                                            <Box name="Set ID" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="542" y="389">
                                                 <bitmap>media/images/box/box-python-script.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -1683,8 +1683,8 @@ class MyClass(GeneratedClass):
             s.sendall('點名完畢')
             data = ''
             data = s.recv(4096)
-            sentence = "\RSPD="+ str( self.getParameter("Speed (%)") ) + "\ "
-            sentence += "\VCT="+ str( self.getParameter("Voice shaping (%)") ) + "\ "
+            sentence = "\RSPD="+ str( 100 ) + "\ "
+            sentence += "\VCT="+ str( 100 ) + "\ "
             sentence += str(data)
             sentence +=  "\RST\ "
             configuration =\
@@ -1849,7 +1849,9 @@ class MyClass(GeneratedClass):
                                                 <bitmap>media/images/box/internet/date.png</bitmap>
                                                 <script language="4">
                                                     <content>
-                                                        <![CDATA[import datetime as d
+                                                        <![CDATA[# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+import datetime as d
 import socket
 
 class MyClass(GeneratedClass):
@@ -1864,7 +1866,7 @@ class MyClass(GeneratedClass):
         #put clean-up code here
         pass
 
-    def onInput_onGet(self,p):
+    def onInput_onGet(self,teacher_name):
         #self.onStopped() #activate the output of the box
         port = 5007
         try:
@@ -1873,7 +1875,7 @@ class MyClass(GeneratedClass):
             s.send('找課程')
             isok = s.recv(2048)
             currentTime = d.datetime.now()
-            course_data = self.getParameter('id') + ',' + str(d.datetime.isoweekday(currentTime)) \
+            course_data = teacher_name + ',' + str(d.datetime.isoweekday(currentTime)) \
                           + ',' +  currentTime.strftime('%H')
             self.logger.info(isok)
             self.logger.info(course_data)
@@ -10880,7 +10882,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>6</language>
+                                                                        <language>7</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -18131,7 +18133,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>6</language>
+                                                                        <language>7</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -18212,9 +18214,9 @@ class MyClass(GeneratedClass):
                         <Link inputowner="1" indexofinput="2" outputowner="6" indexofoutput="6" />
                         <Link inputowner="6" indexofinput="2" outputowner="1" indexofoutput="4" />
                         <Link inputowner="0" indexofinput="4" outputowner="6" indexofoutput="5" />
-                        <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
                         <Link inputowner="2" indexofinput="2" outputowner="6" indexofoutput="7" />
                         <Link inputowner="6" indexofinput="2" outputowner="2" indexofoutput="4" />
+                        <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

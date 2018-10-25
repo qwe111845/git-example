@@ -355,12 +355,12 @@ class MyClass(GeneratedClass):
                             <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" />
                             <Parameter name="File name" inherits_from_parent="0" content_type="3" value="video" default_value="recording" custom_choice="0" tooltip="Name of the destination file without its extension." id="7" />
                             <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="10" default_value="10" min="0.01" max="180" tooltip="Duration of the video capture." id="8" />
-                            <Parameter name="Resolution" inherits_from_parent="0" content_type="3" value="640 x 480" default_value="320 x 240" custom_choice="0" tooltip="Recording resolution." id="9">
+                            <Parameter name="Resolution" inherits_from_parent="0" content_type="3" value="320 x 240" default_value="320 x 240" custom_choice="0" tooltip="Recording resolution." id="9">
                                 <Choice value="160 x 120" />
                                 <Choice value="320 x 240" />
                                 <Choice value="640 x 480" />
                             </Parameter>
-                            <Parameter name="Frame rate (frame/s)" inherits_from_parent="0" content_type="1" value="30" default_value="10" min="1" max="30" tooltip="Recording frame rate.&#x0A;&#x0A;!Warning! MJPG format requires framerate greater than 2.0." id="10" />
+                            <Parameter name="Frame rate (frame/s)" inherits_from_parent="0" content_type="1" value="10" default_value="10" min="1" max="30" tooltip="Recording frame rate.&#x0A;&#x0A;!Warning! MJPG format requires framerate greater than 2.0." id="10" />
                             <Parameter name="Format" inherits_from_parent="0" content_type="3" value="MJPG" default_value="MJPG" custom_choice="0" tooltip="Recording format:&#x0A;- IYUV for raw avi.&#x0A;- MJPG for compressed avi." id="11">
                                 <Choice value="IYUV" />
                                 <Choice value="MJPG" />

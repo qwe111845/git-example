@@ -9,8 +9,8 @@
         <BehaviorDescription name="behavior" src="FaceLearn" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="Course" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="ChatBot" xar="behavior.xar" />
-        <BehaviorDescription name="behavior" src="Conversation" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="Model" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="Conversation" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

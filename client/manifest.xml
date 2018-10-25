@@ -38,11 +38,11 @@
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
-  <behaviorContent path="Conversation">
+  <behaviorContent path="Model">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
-  <behaviorContent path="Model">
+  <behaviorContent path="Conversation">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>

@@ -15,7 +15,7 @@
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
                     <Diagram>
-                        <Box name="SpeechReconition" id="8" localization="8" tooltip="This box is empty and should be used to create any box diagram you would like.&#x0A;&#x0A;To edit its diagram, double-click on it." x="589" y="371">
+                        <Box name="SpeechReconition" id="8" localization="8" tooltip="This box is empty and should be used to create any box diagram you would like.&#x0A;&#x0A;To edit its diagram, double-click on it." x="266" y="346">
                             <bitmap>media/images/box/box-diagram.png</bitmap>
                             <script language="4">
                                 <content>
@@ -1017,7 +1017,7 @@ class MyClass(GeneratedClass):
                             <script language="4">
                                 <content>
                                     <![CDATA[import socket
-
+import time
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
@@ -1039,8 +1039,11 @@ class MyClass(GeneratedClass):
             s.send('reading')
             response = s.recv(2048)
             s.send(str(p))
+            time.sleep(1)
             data = s.recv(8192)
+
             reading_data = data.split(';;')
+            self.logger.info(reading_data)
             if reading_data[len(reading_data)-1] == '':
                 del reading_data[len(reading_data)-1]
 
@@ -1237,7 +1240,7 @@ class MyClass(GeneratedClass):
                             <Parameter name="Enable word spotting" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="If this option is not activated the robot will only understand exact expressions. If it is, he will spot the exact expressions even in the middle of a sentence.&#x0A;&#x0A;!!Warning!! This option is only available with the speech recognition module using Nuance (ie in Atom version of the robot)." id="10" />
                             <Resource name="Speech recognition" type="Lock" timeout="0" />
                         </Box>
-                        <Box name="Tactile Head" id="3" localization="8" tooltip="Detect touch on head tactile sensor." x="853" y="318">
+                        <Box name="Tactile Head" id="3" localization="8" tooltip="Detect touch on head tactile sensor." x="865" y="358">
                             <bitmap>media/images/box/sensors/tactileHead.png</bitmap>
                             <script language="4">
                                 <content>
@@ -8906,7 +8909,7 @@ class MyClass(GeneratedClass):
                                                     <chinese>
                                                         <![CDATA[]]>
 </chinese>
-                                                    <language>6</language>
+                                                    <language>7</language>
                                                 </pluginContent>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -8973,7 +8976,7 @@ class MyClass(GeneratedClass):
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
                                         <Diagram>
-                                            <Box name="Choice" id="1" localization="8" tooltip="The Choice box is based on the speech recognition engine: it expects a defined number of predicted answers . The box&#x0A;includes interactive help during the behavior thanks to the head tactile sensor. Each recognized answer stimulate its&#x0A;corresponding output.&#x0A;Setting the choices in the box table:&#x0A;- Edit a choice by left double-clicking on its line.&#x0A;- Add a choice by right clicking on a line and selecting &apos;Insert a row&apos;.&#x0A;- Delete a choice by right clicking on its line and selecting &apos;Remove a row&apos;.&#x0A;- Write alternative answers for one choice by separating the phrases with &apos;/&apos; in the same line (e.g.: apple pie / pie / apple).&#x0A;&#x0A;Advanced options (click the blue cross):  dedicated to pronunciation test of the choices.&#x0A;- Launch the test with the play button in front of each choice.&#x0A;- Calculate the confidence index of choices with the (1/2/3) button. Closer to 100%, higher should be the speech recognition." plugin="ui_choice_plugin" x="312" y="51">
+                                            <Box name="Choice" id="1" localization="8" tooltip="The Choice box is based on the speech recognition engine: it expects a defined number of predicted answers . The box&#x0A;includes interactive help during the behavior thanks to the head tactile sensor. Each recognized answer stimulate its&#x0A;corresponding output.&#x0A;Setting the choices in the box table:&#x0A;- Edit a choice by left double-clicking on its line.&#x0A;- Add a choice by right clicking on a line and selecting &apos;Insert a row&apos;.&#x0A;- Delete a choice by right clicking on its line and selecting &apos;Remove a row&apos;.&#x0A;- Write alternative answers for one choice by separating the phrases with &apos;/&apos; in the same line (e.g.: apple pie / pie / apple).&#x0A;&#x0A;Advanced options (click the blue cross):  dedicated to pronunciation test of the choices.&#x0A;- Launch the test with the play button in front of each choice.&#x0A;- Calculate the confidence index of choices with the (1/2/3) button. Closer to 100%, higher should be the speech recognition." plugin="ui_choice_plugin" x="414" y="34">
                                                 <bitmap>media/images/box/interaction/choice.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -16051,7 +16054,7 @@ class MyClass(GeneratedClass):
                                                     </BehaviorLayer>
                                                 </Timeline>
                                             </Box>
-                                            <Box name="Localized Text" id="5" localization="8" tooltip="Send on the output the text associated with the robot&apos;s current voice language.&#x0A;You can display and edit the text associated with any language by&#x0A;selecting the language in the combobox.&#x0A;&#x0A;!!Warning!! The text sent on the output is NOT the displayed one but the one&#x0A;associated with the robot&apos;s current voice language." plugin="localizationbox_plugin" x="59" y="54">
+                                            <Box name="Localized Text" id="5" localization="8" tooltip="Send on the output the text associated with the robot&apos;s current voice language.&#x0A;You can display and edit the text associated with any language by&#x0A;selecting the language in the combobox.&#x0A;&#x0A;!!Warning!! The text sent on the output is NOT the displayed one but the one&#x0A;associated with the robot&apos;s current voice language." plugin="localizationbox_plugin" x="109" y="178">
                                                 <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -16157,7 +16160,7 @@ class MyClass(GeneratedClass):
                                                     <chinese>
                                                         <![CDATA[]]>
 </chinese>
-                                                    <language>6</language>
+                                                    <language>7</language>
                                                 </pluginContent>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />

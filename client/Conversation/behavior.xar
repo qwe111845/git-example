@@ -32,7 +32,7 @@
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
                                         <Diagram scale="100">
-                                            <Box name="Internet Check" id="13" localization="8" tooltip="Enter description here" x="85" y="222">
+                                            <Box name="Internet Check" id="13" localization="8" tooltip="Enter description here" x="97" y="291">
                                                 <bitmap>media/images/box/box-diagram.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -1338,7 +1338,6 @@ class MyClass(GeneratedClass):
                                             </Box>
                                             <Link inputowner="1" indexofinput="3" outputowner="1" indexofoutput="5" />
                                             <Link inputowner="1" indexofinput="3" outputowner="1" indexofoutput="6" />
-                                            <Link inputowner="13" indexofinput="4" outputowner="0" indexofoutput="2" />
                                             <Link inputowner="3" indexofinput="2" outputowner="13" indexofoutput="5" />
                                             <Link inputowner="2" indexofinput="2" outputowner="13" indexofoutput="5" />
                                             <Link inputowner="8" indexofinput="2" outputowner="3" indexofoutput="3" />
@@ -1348,6 +1347,7 @@ class MyClass(GeneratedClass):
                                             <Link inputowner="14" indexofinput="2" outputowner="2" indexofoutput="10" />
                                             <Link inputowner="0" indexofinput="6" outputowner="15" indexofoutput="7" />
                                             <Link inputowner="15" indexofinput="5" outputowner="0" indexofoutput="4" />
+                                            <Link inputowner="13" indexofinput="4" outputowner="0" indexofoutput="2" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>
@@ -8879,7 +8879,7 @@ class MyClass(GeneratedClass):
                                                     <chinese>
                                                         <![CDATA[]]>
 </chinese>
-                                                    <language>8</language>
+                                                    <language>9</language>
                                                 </pluginContent>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -9010,6 +9010,8 @@ class MyClass(GeneratedClass):
         self.logger.info(self.user_log)
 
         for i in self.order:
+            if self.now_order > i:
+                break
             if self.now_order == i:
                 time.sleep(1)
                 self.say('ok !still your turn')
@@ -9028,6 +9030,14 @@ class MyClass(GeneratedClass):
             else:
                 pass
 
+        if self.now_order > self.order[-1]:
+            while(self.now_order <= self.len_order):
+                self.say(self.conversation_dic['content'][self.now_order])
+                time.sleep(2)
+                if self.now_order == self.len_order:
+                    self.user_log(self.user_log)
+                else:
+                    self.now_order += 1
 
         self.next()
 
@@ -9153,6 +9163,73 @@ class MyClass(GeneratedClass):
                             <Parameter name="Enable word spotting" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="If this option is not activated the robot will only understand exact expressions. If it is, he will spot the exact expressions even in the middle of a sentence.&#x0A;&#x0A;!!Warning!! This option is only available with the speech recognition module using Nuance (ie in Atom version of the robot)." id="10" />
                             <Resource name="Speech recognition" type="Lock" timeout="0" />
                         </Box>
+                        <Box name="say" id="8" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="789" y="397">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        self.animSpeech = ALProxy('ALAnimatedSpeech')
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.ids = []
+
+    def onUnload(self):
+        for id in self.ids:
+            try:
+                self.animSpeech.stop(id)
+            except:
+                pass
+
+    def onInput_onStart(self, user_log):
+
+        port = 5007
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(('140.134.26.200', port))
+            s.send('log')
+            response = s.recv(1024)
+            self.logger.info(response)
+            s.send(user_log)
+        finally:
+            try:
+                s.close()
+            except:
+                pass
+    def say(self,p, RSPD = 100 , VCT = 100):
+        self.bIsRunning = True
+        try:
+            sentence = "\RSPD="+ str( RSPD ) + "\ "
+            sentence += "\VCT="+ str( VCT ) + "\ "
+            sentence += str(p)
+            sentence +=  "\RST\ "
+            id = self.animSpeech.post.say(str(sentence))
+            self.ids.append(id)
+            self.animSpeech.wait(id, 0)
+        finally:
+            try:
+                self.ids.remove(id)
+            except:
+                pass
+            if( self.ids == [] ):
+                self.bIsRunning = False
+        pass
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
                         <Link inputowner="5" indexofinput="2" outputowner="5" indexofoutput="4" />
                         <Link inputowner="6" indexofinput="2" outputowner="5" indexofoutput="5" />
                         <Link inputowner="2" indexofinput="3" outputowner="2" indexofoutput="5" />
@@ -9162,6 +9239,7 @@ class MyClass(GeneratedClass):
                         <Link inputowner="1" indexofinput="2" outputowner="6" indexofoutput="8" />
                         <Link inputowner="1" indexofinput="4" outputowner="6" indexofoutput="9" />
                         <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Link inputowner="8" indexofinput="2" outputowner="6" indexofoutput="10" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

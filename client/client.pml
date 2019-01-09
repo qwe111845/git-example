@@ -11,6 +11,7 @@
         <BehaviorDescription name="behavior" src="ChatBot" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="Model" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="Conversation" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="PPT_MODE" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

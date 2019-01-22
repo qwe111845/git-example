@@ -218,7 +218,7 @@ class MyClass(GeneratedClass):
                                                     <chinese>
                                                         <![CDATA[]]>
 </chinese>
-                                                    <language>9</language>
+                                                    <language>13</language>
                                                 </pluginContent>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -280,43 +280,39 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self, False)
         self.animSpeech = ALProxy('ALAnimatedSpeech')
+        self.speech_rate = 100
 
     def onLoad(self):
         self.bIsRunning = False
         self.ids = []
 
     def onUnload(self):
-        self.sock.close()
         for id in self.ids:
             try:
                 self.animSpeech.stop(id)
             except:
                 pass
 
-    def onInput_onStart(self, myip):
+    def onInput_onStart(self, my):
         self.say('進入PPT模式')
-        port = 6669
+        port = int(my[1])
+        ip = my[0]
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(300)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind((myip, port))
+        self.sock.bind((ip, 6666))
         self.sock.listen(1)
         self.say('server waiting')
-        while True:
+        self.link = True
+
+        while self.link:
             client, address = self.sock.accept()
             client.settimeout(300)
             threading.Thread(args=(client, address), target=self.listen_to_client).start()
 
-
-        try:
-            self.sock.close()
-            self.Chinese()
-            self.say('離開PPT模式')
-            self.onStopped() # activate output of the box
-        except:
-            pass
     def listen_to_client(self, client, address):
-        link = True
-        while link != False:
+
+        while self.link:
             try:
                 data = client.recv(2048)
 
@@ -325,31 +321,47 @@ class MyClass(GeneratedClass):
                     for msg in msgs:
                         if msg == 'English':
                             self.English()
-                            time.sleep(2)
-                            self.say("change English")
+                            time.sleep(1)
+                            self.say("change English", self.speech_rate)
                         elif msg == 'Chinese':
                             self.Chinese()
-                            time.sleep(2)
-                            self.say("變為中文")
+                            time.sleep(1)
+                            self.say("變為中文", self.speech_rate)
                         elif msg == 'Quit ppt mode':
-                            link = False
+                            time.sleep(1)
+                            self.link = False
+                        elif msg == 'Increased speech rate':
+                            if self.speech_rate <= 90:
+                                self.speech_rate += 10
+                                self.say('Increased speech rate', self.speech_rate)
+                            else:
+                                self.say('The speed of speech has reached the highest', self.speech_rate)
+                        elif msg == 'Reduce speech rate':
+                            if self.speech_rate >= 70:
+                                self.speech_rate -= 10
+                                self.say('Reduce speech rate', self.speech_rate)
+                            else:
+                                self.say('Speech rate has been reduced to the lowest', self.speech_rate)
                         else:
                             msgs = msg.split(":::")
                             for text in msgs:
-                                self.say(text)
+                                self.say(text, self.speech_rate)
                                 time.sleep(1)
                     data = None
                 else:
                     time.sleep(2)
             except:
                 client.close()
-                return False
+                break
         client.close()
-        self.sock.close()
         self.Chinese()
-        time.sleep(1)
+        self.sock.close()
+
         self.say('離開PPT模式')
-        self.onStopped() # activate output of the box
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box
+
+        time.sleep(1)
 
     def say(self,p, RSPD = 100 , VCT = 100):
         self.bIsRunning = True
@@ -371,13 +383,12 @@ class MyClass(GeneratedClass):
         pass
 
     def onInput_onStop(self):
-        self.sock.close()
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
         self.onStopped() #activate the output of the box]]>
 </content>
                                                 </script>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                                                <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStart" type="3" type_size="2" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                                                 <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                                                 <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                                                 <Output name="English" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" />
@@ -552,12 +563,17 @@ class MyClass(GeneratedClass):
         port = 5007
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('140.134.26.200', port))
-        myip = s.getsockname()[0]
+        my_ip = s.getsockname()[0]
 
-        s.send('get ip')
+        s.send('get robot port')
+        my_port = s.recv(1024)
+
+
+        self.logger.info("myport:" + str(my_port))
+
         s.close()
         time.sleep(2)
-        self.onStopped(myip)
+        self.onStopped([my_ip, my_port])
 
     def onInput_onStop(self):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
@@ -567,13 +583,13 @@ class MyClass(GeneratedClass):
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                                                 <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
-                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                                                <Output name="onStopped" type="3" type_size="2" nature="1" inner="0" tooltip="" id="4" />
                                             </Box>
                                             <Link inputowner="1" indexofinput="2" outputowner="8" indexofoutput="5" />
                                             <Link inputowner="3" indexofinput="2" outputowner="8" indexofoutput="6" />
                                             <Link inputowner="0" indexofinput="4" outputowner="8" indexofoutput="4" />
-                                            <Link inputowner="8" indexofinput="2" outputowner="4" indexofoutput="4" />
                                             <Link inputowner="4" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="8" indexofinput="2" outputowner="4" indexofoutput="4" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>

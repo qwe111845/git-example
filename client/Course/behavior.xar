@@ -8909,7 +8909,7 @@ class MyClass(GeneratedClass):
                                                     <chinese>
                                                         <![CDATA[]]>
 </chinese>
-                                                    <language>9</language>
+                                                    <language>6</language>
                                                 </pluginContent>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                 <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -8976,6 +8976,153 @@ class MyClass(GeneratedClass):
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
                                         <Diagram>
+                                            <Box name="Python Script" id="2" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="635" y="197">
+                                                <bitmap>media/images/box/box-python-script.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.unit = ''
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self,p):
+        #self.onStopped() #activate the output of the box
+        self.unit = p[5:]
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box
+
+    def onInput_ok(self):
+        self.onStopped(self.unit) #activate the output of the box
+        pass]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                                                <Input name="ok" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
+                                            </Box>
+                                            <Box name="Localized Text" id="5" localization="8" tooltip="Send on the output the text associated with the robot&apos;s current voice language.&#x0A;You can display and edit the text associated with any language by&#x0A;selecting the language in the combobox.&#x0A;&#x0A;!!Warning!! The text sent on the output is NOT the displayed one but the one&#x0A;associated with the robot&apos;s current voice language." plugin="localizationbox_plugin" x="109" y="178">
+                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		try: # disable autoBind
+			GeneratedClass.__init__(self, False)
+		except TypeError: # if NAOqi < 1.14
+			GeneratedClass.__init__( self )
+
+		self.tts = ALProxy("ALTextToSpeech")
+		self.sentences = {
+			"Arabic" : "  ",
+			"Czech" : " Máš rád čokoládu? ",
+			"Danish" : " Kan du lide chokolade? ",
+			"German" : " Mögen Sie Schokolade? ",
+			"Greek" : "  ",
+			"English" : " Are you sure? ",
+			"Spanish" : " ¿Te gusta el chocolate? ",
+			"Finnish" : " Pidätkö suklaasta? ",
+			"French" : " Aimes-tu le chocolat ? ",
+			"Italian" : " Ti piace il cioccolato? ",
+			"Japanese" : " チョコレートが好きですか ",
+			"Korean" : " 당신은 초콜렛을 좋아합니까? ",
+			"Dutch" : " Hou je van chocolade? ",
+			"Norwegian" : "  ",
+			"Polish" : " Lubisz czekoladę? ",
+			"Brazilian" : " Você gosta de chocolate? ",
+			"Portuguese" : " Gostas de chocolate? ",
+			"Russian" : " Вы любите шоколад? ",
+			"Swedish" : " Gillar du choklad? ",
+			"Turkish" : " Çikolata sever misin? ",
+			"Chinese" : "  "
+		}
+
+	def onInput_onStart(self):
+		sDefaultLang = self.tts.getLanguage()
+		self.onStopped(self.sentences[sDefaultLang])]]>
+</content>
+                                                </script>
+                                                <pluginContent>
+                                                    <arabic>
+                                                        <![CDATA[]]>
+</arabic>
+                                                    <czech>
+                                                        <![CDATA[Máš rád čokoládu?]]>
+</czech>
+                                                    <danish>
+                                                        <![CDATA[Kan du lide chokolade?]]>
+</danish>
+                                                    <german>
+                                                        <![CDATA[Mögen Sie Schokolade?]]>
+</german>
+                                                    <greek>
+                                                        <![CDATA[]]>
+</greek>
+                                                    <english>
+                                                        <![CDATA[Are you sure?]]>
+</english>
+                                                    <spanish>
+                                                        <![CDATA[¿Te gusta el chocolate?]]>
+</spanish>
+                                                    <finnish>
+                                                        <![CDATA[Pidätkö suklaasta?]]>
+</finnish>
+                                                    <french>
+                                                        <![CDATA[Aimes-tu le chocolat ?]]>
+</french>
+                                                    <italian>
+                                                        <![CDATA[Ti piace il cioccolato?]]>
+</italian>
+                                                    <japanese>
+                                                        <![CDATA[チョコレートが好きですか]]>
+</japanese>
+                                                    <korean>
+                                                        <![CDATA[당신은 초콜렛을 좋아합니까?]]>
+</korean>
+                                                    <dutch>
+                                                        <![CDATA[Hou je van chocolade?]]>
+</dutch>
+                                                    <norwegian>
+                                                        <![CDATA[]]>
+</norwegian>
+                                                    <polish>
+                                                        <![CDATA[Lubisz czekoladę?]]>
+</polish>
+                                                    <brazilian>
+                                                        <![CDATA[Você gosta de chocolate?]]>
+</brazilian>
+                                                    <portuguese>
+                                                        <![CDATA[Gostas de chocolate?]]>
+</portuguese>
+                                                    <russian>
+                                                        <![CDATA[Вы любите шоколад?]]>
+</russian>
+                                                    <swedish>
+                                                        <![CDATA[Gillar du choklad?]]>
+</swedish>
+                                                    <turkish>
+                                                        <![CDATA[Çikolata sever misin?]]>
+</turkish>
+                                                    <chinese>
+                                                        <![CDATA[]]>
+</chinese>
+                                                    <language>11</language>
+                                                </pluginContent>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
+                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Data sent when asked." id="3" />
+                                            </Box>
                                             <Box name="Choice" id="1" localization="8" tooltip="The Choice box is based on the speech recognition engine: it expects a defined number of predicted answers . The box&#x0A;includes interactive help during the behavior thanks to the head tactile sensor. Each recognized answer stimulate its&#x0A;corresponding output.&#x0A;Setting the choices in the box table:&#x0A;- Edit a choice by left double-clicking on its line.&#x0A;- Add a choice by right clicking on a line and selecting &apos;Insert a row&apos;.&#x0A;- Delete a choice by right clicking on its line and selecting &apos;Remove a row&apos;.&#x0A;- Write alternative answers for one choice by separating the phrases with &apos;/&apos; in the same line (e.g.: apple pie / pie / apple).&#x0A;&#x0A;Advanced options (click the blue cross):  dedicated to pronunciation test of the choices.&#x0A;- Launch the test with the play button in front of each choice.&#x0A;- Calculate the confidence index of choices with the (1/2/3) button. Closer to 100%, higher should be the speech recognition." plugin="ui_choice_plugin" x="414" y="34">
                                                 <bitmap>media/images/box/interaction/choice.png</bitmap>
                                                 <script language="4">
@@ -16054,160 +16201,13 @@ class MyClass(GeneratedClass):
                                                     </BehaviorLayer>
                                                 </Timeline>
                                             </Box>
-                                            <Box name="Localized Text" id="5" localization="8" tooltip="Send on the output the text associated with the robot&apos;s current voice language.&#x0A;You can display and edit the text associated with any language by&#x0A;selecting the language in the combobox.&#x0A;&#x0A;!!Warning!! The text sent on the output is NOT the displayed one but the one&#x0A;associated with the robot&apos;s current voice language." plugin="localizationbox_plugin" x="109" y="178">
-                                                <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
-                                                <script language="4">
-                                                    <content>
-                                                        <![CDATA[# /!\ Generated content. Do not edit!
-class MyClass(GeneratedClass):
-	def __init__(self):
-		try: # disable autoBind
-			GeneratedClass.__init__(self, False)
-		except TypeError: # if NAOqi < 1.14
-			GeneratedClass.__init__( self )
-
-		self.tts = ALProxy("ALTextToSpeech")
-		self.sentences = {
-			"Arabic" : "  ",
-			"Czech" : " Máš rád čokoládu? ",
-			"Danish" : " Kan du lide chokolade? ",
-			"German" : " Mögen Sie Schokolade? ",
-			"Greek" : "  ",
-			"English" : " Are you sure? ",
-			"Spanish" : " ¿Te gusta el chocolate? ",
-			"Finnish" : " Pidätkö suklaasta? ",
-			"French" : " Aimes-tu le chocolat ? ",
-			"Italian" : " Ti piace il cioccolato? ",
-			"Japanese" : " チョコレートが好きですか ",
-			"Korean" : " 당신은 초콜렛을 좋아합니까? ",
-			"Dutch" : " Hou je van chocolade? ",
-			"Norwegian" : "  ",
-			"Polish" : " Lubisz czekoladę? ",
-			"Brazilian" : " Você gosta de chocolate? ",
-			"Portuguese" : " Gostas de chocolate? ",
-			"Russian" : " Вы любите шоколад? ",
-			"Swedish" : " Gillar du choklad? ",
-			"Turkish" : " Çikolata sever misin? ",
-			"Chinese" : "  "
-		}
-
-	def onInput_onStart(self):
-		sDefaultLang = self.tts.getLanguage()
-		self.onStopped(self.sentences[sDefaultLang])]]>
-</content>
-                                                </script>
-                                                <pluginContent>
-                                                    <arabic>
-                                                        <![CDATA[]]>
-</arabic>
-                                                    <czech>
-                                                        <![CDATA[Máš rád čokoládu?]]>
-</czech>
-                                                    <danish>
-                                                        <![CDATA[Kan du lide chokolade?]]>
-</danish>
-                                                    <german>
-                                                        <![CDATA[Mögen Sie Schokolade?]]>
-</german>
-                                                    <greek>
-                                                        <![CDATA[]]>
-</greek>
-                                                    <english>
-                                                        <![CDATA[Are you sure?]]>
-</english>
-                                                    <spanish>
-                                                        <![CDATA[¿Te gusta el chocolate?]]>
-</spanish>
-                                                    <finnish>
-                                                        <![CDATA[Pidätkö suklaasta?]]>
-</finnish>
-                                                    <french>
-                                                        <![CDATA[Aimes-tu le chocolat ?]]>
-</french>
-                                                    <italian>
-                                                        <![CDATA[Ti piace il cioccolato?]]>
-</italian>
-                                                    <japanese>
-                                                        <![CDATA[チョコレートが好きですか]]>
-</japanese>
-                                                    <korean>
-                                                        <![CDATA[당신은 초콜렛을 좋아합니까?]]>
-</korean>
-                                                    <dutch>
-                                                        <![CDATA[Hou je van chocolade?]]>
-</dutch>
-                                                    <norwegian>
-                                                        <![CDATA[]]>
-</norwegian>
-                                                    <polish>
-                                                        <![CDATA[Lubisz czekoladę?]]>
-</polish>
-                                                    <brazilian>
-                                                        <![CDATA[Você gosta de chocolate?]]>
-</brazilian>
-                                                    <portuguese>
-                                                        <![CDATA[Gostas de chocolate?]]>
-</portuguese>
-                                                    <russian>
-                                                        <![CDATA[Вы любите шоколад?]]>
-</russian>
-                                                    <swedish>
-                                                        <![CDATA[Gillar du choklad?]]>
-</swedish>
-                                                    <turkish>
-                                                        <![CDATA[Çikolata sever misin?]]>
-</turkish>
-                                                    <chinese>
-                                                        <![CDATA[]]>
-</chinese>
-                                                    <language>9</language>
-                                                </pluginContent>
-                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
-                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Data sent when asked." id="3" />
-                                            </Box>
-                                            <Box name="Python Script" id="2" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="635" y="197">
-                                                <bitmap>media/images/box/box-python-script.png</bitmap>
-                                                <script language="4">
-                                                    <content>
-                                                        <![CDATA[class MyClass(GeneratedClass):
-    def __init__(self):
-        GeneratedClass.__init__(self)
-        self.unit = ''
-    def onLoad(self):
-        #put initialization code here
-        pass
-
-    def onUnload(self):
-        #put clean-up code here
-        pass
-
-    def onInput_onStart(self,p):
-        #self.onStopped() #activate the output of the box
-        self.unit = p[5:]
-
-    def onInput_onStop(self):
-        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
-        self.onStopped() #activate the output of the box
-
-    def onInput_ok(self):
-        self.onStopped(self.unit) #activate the output of the box
-        pass]]>
-</content>
-                                                </script>
-                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                                                <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
-                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
-                                                <Input name="ok" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
-                                                <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
-                                            </Box>
-                                            <Link inputowner="1" indexofinput="2" outputowner="5" indexofoutput="3" />
-                                            <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
-                                            <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="5" />
                                             <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="0" indexofinput="5" outputowner="2" indexofoutput="5" />
+                                            <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="1" indexofinput="2" outputowner="5" indexofoutput="3" />
+                                            <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="5" />
                                             <Link inputowner="2" indexofinput="4" outputowner="1" indexofoutput="6" />
                                             <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="7" />
-                                            <Link inputowner="0" indexofinput="5" outputowner="2" indexofoutput="5" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>

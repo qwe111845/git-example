@@ -15,7 +15,7 @@
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
                     <Diagram>
-                        <Box name="video transport" id="1" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="595" y="273">
+                        <Box name="video transport" id="1" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="876" y="390">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -42,11 +42,11 @@ class MyClass(GeneratedClass):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("140.134.26.200", port))
+            s.send('file')
             print s.recv(SIZE)
             s.send('d0342273;d0342273-video.avi')
-            time.sleep(0.2)
             print s.recv(SIZE)
-            s.send('f')
+            time.sleep(0.2)
             print 'sending, please wait for a second ...'
             self.logger.info('sending, please wait for a second ...')
             time.sleep(0.2)
@@ -79,72 +79,6 @@ class MyClass(GeneratedClass):
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                         </Box>
-                        <Box name="Internet Connection" id="2" localization="8" tooltip="This box detects when the robot is connected or disconnected to the Internet." x="75" y="104">
-                            <bitmap>media/images/box/internet/internet.png</bitmap>
-                            <script language="4">
-                                <content>
-                                    <![CDATA[import socket
-import time
-import urllib2
-
-class MyClass(GeneratedClass):
-    def __init__(self):
-        GeneratedClass.__init__(self, False)
-
-    def onLoad(self):
-        self.bIsRunning = False
-        self.bConnected = None
-
-    def onUnload(self):
-        self.bMustStop = True
-
-    def onInput_onStart(self):
-        if( self.bIsRunning ):
-            return
-        self.bIsRunning = True
-        self.bMustStop = False
-        previousTimeout = socket.getdefaulttimeout()
-        while( not self.bMustStop ):
-            nTimeout = self.getParameter("Time to refresh (s)")
-            tempReqs = self.getParameter("URLs").split(';')
-            reqs = []
-            for tempReq in tempReqs:
-                reqs.append(tempReq.strip(" \n"))
-            socket.setdefaulttimeout(nTimeout * 1. / len(reqs))
-            bOk = False
-            for req in reqs:
-                try:
-                    urllib2.urlopen(req)
-                    bOk = True
-                    break
-                except:
-                    pass
-            if( self.bConnected == None ):
-                self.bConnected = not bOk
-            if( bOk and not self.bConnected ):
-                self.bConnected = True
-                self.connected()
-                time.sleep(nTimeout)
-            if( not bOk and self.bConnected ):
-                self.bConnected = False
-                self.notconnected()
-        socket.setdefaulttimeout(previousTimeout)
-        self.bIsRunning = False
-
-    def onInput_onStop(self):
-        self.onUnload()
-        self.onStopped()]]>
-</content>
-                            </script>
-                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
-                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
-                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is stopped." id="4" />
-                            <Output name="connected" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the robot just connected to the Internet." id="5" />
-                            <Output name="notconnected" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the robot has just been disconnected from the Internet." id="6" />
-                            <Parameter name="Time to refresh (s)" inherits_from_parent="0" content_type="1" value="10" default_value="10" min="2" max="60" tooltip="Time ellapsed before checking the connection again." id="7" />
-                            <Parameter name="URLs" inherits_from_parent="0" content_type="3" value="http://aldebaran.com/;https://www.google.com" default_value="http://aldebaran.com/;http://www.google.com" custom_choice="0" tooltip="List of URLs used to check the connection separated by &apos;;&apos;." id="8" />
-                        </Box>
                         <Box name="Record Sound" id="3" localization="8" tooltip='Record a sound on the robot. You can choose to record only with one&#x0A;microphone (the front head microphone) in ogg format, or with four microphones&#x0A;(front, sides and rear head microphones) in wav format.&#x0A;&#x0A;If &quot;Temporary storage&quot; isn&apos;t checked, the output sound file is located in &quot;~/recordings/microphones/&lt;File name&gt;&quot;.&#x0A;Else, it is located in a temporary directory&#x0A;&#x0A;The onStopped output is stimulated at the end of the recording and contains the absolute path to the output sound file&#x0A;&#x0A;V1.1.0&#x0A;' x="437" y="162">
                             <bitmap>media/images/box/interaction/rec_sound.png</bitmap>
                             <script language="4">
@@ -164,7 +98,7 @@ class MyClass(GeneratedClass):
                                 <Choice value="Front, sides and rear head microphones (.wav)" />
                             </Parameter>
                             <Parameter name="Temporary storage" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Choose if the file should be stored as a temporary file so it is removed as soon&#x0A;as the behavior is unloaded.&#x0A;&#x0A;When this option is disabled the file is stored in ~/recordings/microphones. You can&#x0A;then get it on your computer using the menu Connection/File transfer.&#x0A;&#x0A;When this option is enabled the file is stored in the temporary folder of the behavior." id="9" />
-                            <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="10" default_value="5" min="0.1" max="180" tooltip="Duration of the recording in seconds." id="10" />
+                            <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="180" default_value="5" min="0.1" max="180" tooltip="Duration of the recording in seconds." id="10" />
                             <Timeline enable="0">
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
@@ -354,7 +288,7 @@ class MyClass(GeneratedClass):
                             <Input name="MiddleTactilTouched" type="0" type_size="1" nature="4" stm_value_name="MiddleTactilTouched" inner="1" tooltip="MiddleTactilTouched desc" id="5" />
                             <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" />
                             <Parameter name="File name" inherits_from_parent="0" content_type="3" value="video" default_value="recording" custom_choice="0" tooltip="Name of the destination file without its extension." id="7" />
-                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="10" default_value="10" min="0.01" max="180" tooltip="Duration of the video capture." id="8" />
+                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="180" default_value="10" min="0.01" max="180" tooltip="Duration of the video capture." id="8" />
                             <Parameter name="Resolution" inherits_from_parent="0" content_type="3" value="320 x 240" default_value="320 x 240" custom_choice="0" tooltip="Recording resolution." id="9">
                                 <Choice value="160 x 120" />
                                 <Choice value="320 x 240" />
@@ -528,7 +462,7 @@ class MyClass(GeneratedClass):
                                 </BehaviorLayer>
                             </Timeline>
                         </Box>
-                        <Box name="record transport" id="5" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="597" y="131">
+                        <Box name="record transport" id="5" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="582" y="415">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -555,10 +489,10 @@ class MyClass(GeneratedClass):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("140.134.26.200", port))
+            s.send('file')
             print s.recv(SIZE)
             s.send('d0342273;d0342273-record.wav')
             print s.recv(SIZE)
-            s.send('f')
             print 'sending, please wait for a second ...'
             self.logger.info('sending, please wait for a second ...')
             time.sleep(0.2)
@@ -601,7 +535,6 @@ class MyClass(GeneratedClass):
         GeneratedClass.__init__(self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.animSpeech = ALProxy('ALAnimatedSpeech')
-        self.record = False
         self.video = False
 
     def onLoad(self):
@@ -625,34 +558,30 @@ class MyClass(GeneratedClass):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
         self.onStopped() #activate the output of the box
 
-    def onInput_record_ok(self):
-        self.record = True
-        if self.video == True:
-            self.merge_file()
-        pass
-
     def onInput_video_ok(self):
         self.video = True
-        if self.record == True:
-            self.merge_file()
-        pass
+        self.merge_file()
+
     def merge_file(self):
         port = 5007
         SIZE = 1024
         self.socket.connect(("140.134.26.200", port))
+
+        self.socket.send('merge')
         print self.socket.recv(SIZE)
+
         self.socket.send('d0342273;d0342273.mp4')
         print self.socket.recv(SIZE)
-        self.socket.send('merge')
+
         self.logger.info('sending, please wait for a second ...')
-        self.say('sending, please wait for a second ...')
+        self.say('sending, please wait for a second ...', 80)
 
         response = self.socket.recv(SIZE)
         while not response:
             time.sleep(2)
             response = self.socket.recv(SIZE)
 
-        self.say(response)
+        self.say(response, 80)
         self.onStopped()
 
     def say(self,p, RSPD = 100 , VCT = 100):
@@ -678,11 +607,10 @@ class MyClass(GeneratedClass):
                             <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                             <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
-                            <Input name="record_ok" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
-                            <Input name="video_ok" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" />
-                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" />
+                            <Input name="video_ok" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
                         </Box>
-                        <Box name="say" id="8" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="286" y="234">
+                        <Box name="say" id="8" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="252" y="118">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -881,7 +809,7 @@ class MyClass(GeneratedClass):
                             </Timeline>
                             <Resource name="Head-sequence" type="Lock" timeout="0" />
                         </Box>
-                        <Box name="say (1)" id="11" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="765" y="123">
+                        <Box name="say (1)" id="11" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="758" y="212">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -904,7 +832,7 @@ class MyClass(GeneratedClass):
                 pass
 
     def onInput_onStart(self):
-        self.say('end record')
+        self.say('end record, now Start transferring recording and video', 80)
         self.onStopped()
 
     def say(self,p, RSPD = 100 , VCT = 100):
@@ -937,18 +865,60 @@ class MyClass(GeneratedClass):
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                         </Box>
-                        <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Box name="Wait" id="2" localization="8" tooltip="Wait a moment before sending a signal on the output. &#x0A;Can be stopped anytime. &#x0A;Stimulating the input again before output is activated restarts the waiting period.&#x0A;" x="732" y="381">
+                            <bitmap>media/images/box/wait.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.waiting = None
+
+    def onUnload(self):
+        self.cancelWaiting()
+
+    def triggerOutput(self):
+        self.timerOutput(self.path)
+
+    def cancelWaiting(self):
+        if self.waiting:
+            self.waiting.cancel()
+        self.waiting = None
+
+    def onInput_onStart(self, p):
+        self.path = p
+        self.cancelWaiting()
+        import qi
+        self.waiting = qi.async(self.triggerOutput, delay=int(self.getParameter("Timeout (s)") * 1000 * 1000))
+
+    def onInput_onStop(self):
+        if self.getParameter("Trigger timerOutput if cancelled") and self.waiting and self.waiting.isRunning():
+            self.timerOutput(self.path)
+        self.onUnload()]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" />
+                            <Output name="timerOutput" type="3" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is elapsed, or if the box is stopped and the appropriate parameter is set." id="4" />
+                            <Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="3070.18" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" />
+                            <Parameter name="Trigger timerOutput if cancelled" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="If the box is currently waiting and cancelled, output will be stimulated." id="6" />
+                        </Box>
                         <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
-                        <Link inputowner="6" indexofinput="5" outputowner="1" indexofoutput="4" />
-                        <Link inputowner="0" indexofinput="4" outputowner="6" indexofoutput="6" />
+                        <Link inputowner="6" indexofinput="4" outputowner="1" indexofoutput="4" />
+                        <Link inputowner="0" indexofinput="4" outputowner="6" indexofoutput="5" />
                         <Link inputowner="4" indexofinput="2" outputowner="8" indexofoutput="4" />
                         <Link inputowner="3" indexofinput="2" outputowner="8" indexofoutput="4" />
-                        <Link inputowner="10" indexofinput="2" outputowner="2" indexofoutput="5" />
                         <Link inputowner="8" indexofinput="2" outputowner="10" indexofoutput="8" />
                         <Link inputowner="5" indexofinput="2" outputowner="3" indexofoutput="6" />
-                        <Link inputowner="1" indexofinput="2" outputowner="4" indexofoutput="6" />
-                        <Link inputowner="11" indexofinput="2" outputowner="5" indexofoutput="4" />
-                        <Link inputowner="6" indexofinput="4" outputowner="11" indexofoutput="4" />
+                        <Link inputowner="10" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Link inputowner="10" indexofinput="3" outputowner="10" indexofoutput="9" />
+                        <Link inputowner="2" indexofinput="3" outputowner="5" indexofoutput="4" />
+                        <Link inputowner="2" indexofinput="2" outputowner="4" indexofoutput="6" />
+                        <Link inputowner="1" indexofinput="2" outputowner="2" indexofoutput="4" />
+                        <Link inputowner="11" indexofinput="2" outputowner="3" indexofoutput="6" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

@@ -46,7 +46,11 @@
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
-  <behaviorContent path="PPT_MODE">
+  <behaviorContent path="PPTMode">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Tutor">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>

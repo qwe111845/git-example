@@ -14,10 +14,14 @@
         <BehaviorDescription name="behavior" src="PPTMode" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="Tutor" xar="behavior.xar" />
     </BehaviorDescriptions>
-    <Dialogs />
+    <Dialogs>
+        <Dialog name="Tutor_dialog" src="Tutor/Tutor_dialog/Tutor_dialog.dlg" />
+    </Dialogs>
     <Resources>
         <File name="choice_sentences" src="Course/Aldebaran/choice_sentences.xml" />
     </Resources>
-    <Topics />
+    <Topics>
+        <Topic name="Tutor_dialog_enu" src="Tutor/Tutor_dialog/Tutor_dialog_enu.top" topicName="Tutor_dialog" language="en_US" />
+    </Topics>
     <IgnoredPaths />
 </Package>

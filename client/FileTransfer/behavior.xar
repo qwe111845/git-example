@@ -462,7 +462,7 @@ class MyClass(GeneratedClass):
                                 </BehaviorLayer>
                             </Timeline>
                         </Box>
-                        <Box name="record transport" id="5" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="582" y="415">
+                        <Box name="record transport" id="5" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="561" y="394">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -633,7 +633,7 @@ class MyClass(GeneratedClass):
                 pass
 
     def onInput_onStart(self):
-        self.say('start record')
+        self.say('start recording')
         self.onStopped()
 
     def say(self,p, RSPD = 100 , VCT = 100):

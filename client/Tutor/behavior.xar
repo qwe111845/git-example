@@ -15,7 +15,7 @@
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
                     <Diagram>
-                        <Box name="Recording transmission" id="1" localization="8" tooltip="" x="574" y="223">
+                        <Box name="Recording transmission" id="1" localization="8" tooltip="" x="659" y="256">
                             <bitmap>media/images/box/box-diagram.png</bitmap>
                             <script language="4">
                                 <content>
@@ -908,14 +908,14 @@ class MyClass(GeneratedClass):
 </content>
                             </script>
                             <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                             <Timeline enable="0">
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
                                         <Diagram>
-                                            <Box name="SpeechReconition" id="1" localization="8" tooltip="This box is empty and should be used to create any box diagram you would like.&#x0A;&#x0A;To edit its diagram, double-click on it." x="714" y="71">
+                                            <Box name="Conversation" id="1" localization="8" tooltip="This box is empty and should be used to create any box diagram you would like.&#x0A;&#x0A;To edit its diagram, double-click on it." x="714" y="71">
                                                 <bitmap>media/images/box/box-diagram.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -9329,7 +9329,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>10</language>
+                                                                        <language>11</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -9362,7 +9362,7 @@ class MyClass(GeneratedClass):
                                                 <Resource name="Speech" type="Lock" timeout="0" />
                                                 <Resource name="Speech recognition" type="Lock" timeout="0" />
                                             </Box>
-                                            <Box name="conversation_data" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="533" y="292">
+                                            <Box name="conversation_data" id="6" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="544" y="277">
                                                 <bitmap>media/images/box/box-python-script.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -9382,7 +9382,7 @@ class MyClass(GeneratedClass):
         self.order = []
         self.user_log = {'student':[], 'character':[], 'student_say':[], 'character_say':[]}
         self.now_order = 0
-        self.sid = 'm0626957'
+        self.sid = ''
 
     def onLoad(self):
         self.bIsRunning = False
@@ -9395,7 +9395,11 @@ class MyClass(GeneratedClass):
             except:
                 pass
 
-    def onInput_onStart(self, unit):
+    def onInput_onStart(self, sid):
+        self.sid = sid
+        pass
+
+    def onInput_get_data(self, unit):
         port = 5007
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -9545,11 +9549,12 @@ class MyClass(GeneratedClass):
                                                 <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                                                 <Input name="set_character" type="3" type_size="1" nature="1" inner="0" tooltip="" id="4" />
                                                 <Input name="get_sentence" type="3" type_size="1" nature="1" inner="0" tooltip="" id="5" />
-                                                <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" />
-                                                <Output name="send_characters" type="3" type_size="1" nature="2" inner="0" tooltip="" id="7" />
-                                                <Output name="start_conversation" type="1" type_size="1" nature="2" inner="0" tooltip="" id="8" />
-                                                <Output name="next" type="1" type_size="1" nature="2" inner="0" tooltip="" id="9" />
-                                                <Output name="send_log" type="3" type_size="1" nature="1" inner="0" tooltip="" id="10" />
+                                                <Input name="get_data" type="3" type_size="1" nature="1" inner="0" tooltip="" id="6" />
+                                                <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="7" />
+                                                <Output name="send_characters" type="3" type_size="1" nature="2" inner="0" tooltip="" id="8" />
+                                                <Output name="start_conversation" type="1" type_size="1" nature="2" inner="0" tooltip="" id="9" />
+                                                <Output name="next" type="1" type_size="1" nature="2" inner="0" tooltip="" id="10" />
+                                                <Output name="send_log" type="3" type_size="1" nature="1" inner="0" tooltip="" id="11" />
                                             </Box>
                                             <Box name="Speech Reco." id="2" localization="8" tooltip="Recognize a word from a list of words set in the box parameters.&#x0A;&#x0A;V1.1.0&#x0A;" x="328" y="49">
                                                 <bitmap>media/images/box/interaction/ear.png</bitmap>
@@ -9707,16 +9712,17 @@ class MyClass(GeneratedClass):
                                                 <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                                             </Box>
                                             <Link inputowner="5" indexofinput="2" outputowner="5" indexofoutput="4" />
-                                            <Link inputowner="6" indexofinput="2" outputowner="5" indexofoutput="5" />
                                             <Link inputowner="2" indexofinput="3" outputowner="2" indexofoutput="5" />
-                                            <Link inputowner="2" indexofinput="2" outputowner="6" indexofoutput="7" />
+                                            <Link inputowner="2" indexofinput="2" outputowner="6" indexofoutput="8" />
                                             <Link inputowner="6" indexofinput="4" outputowner="2" indexofoutput="5" />
                                             <Link inputowner="6" indexofinput="5" outputowner="1" indexofoutput="6" />
-                                            <Link inputowner="1" indexofinput="2" outputowner="6" indexofoutput="8" />
-                                            <Link inputowner="1" indexofinput="4" outputowner="6" indexofoutput="9" />
-                                            <Link inputowner="8" indexofinput="2" outputowner="6" indexofoutput="10" />
+                                            <Link inputowner="1" indexofinput="2" outputowner="6" indexofoutput="9" />
+                                            <Link inputowner="1" indexofinput="4" outputowner="6" indexofoutput="10" />
+                                            <Link inputowner="8" indexofinput="2" outputowner="6" indexofoutput="11" />
                                             <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
                                             <Link inputowner="0" indexofinput="4" outputowner="8" indexofoutput="4" />
+                                            <Link inputowner="6" indexofinput="6" outputowner="5" indexofoutput="5" />
+                                            <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>
@@ -10791,7 +10797,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>8</language>
+                                                                        <language>9</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -18769,7 +18775,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>11</language>
+                                                                        <language>12</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -26020,7 +26026,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>11</language>
+                                                                        <language>12</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -26174,7 +26180,7 @@ class MyClass(GeneratedClass):
                                 </BehaviorLayer>
                             </Timeline>
                         </Box>
-                        <Box name="Dialog" id="5" localization="8" tooltip="An example of multilanguage dialog implementation" x="256" y="308">
+                        <Box name="Dialog" id="5" localization="8" tooltip="An example of multilanguage dialog implementation" x="310" y="264">
                             <dialogFile>Tutor_dialog/Tutor_dialog.dlg</dialogFile>
                             <bitmap>media/images/box/box-dialog.png</bitmap>
                             <script language="4">
@@ -26213,8 +26219,9 @@ class MyClass(GeneratedClass):
                             <Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" />
                         </Box>
                         <Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="2" />
-                        <Link inputowner="1" indexofinput="2" outputowner="3" indexofoutput="3" />
                         <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="4" />
+                        <Link inputowner="2" indexofinput="2" outputowner="3" indexofoutput="3" />
+                        <Link inputowner="0" indexofinput="4" outputowner="2" indexofoutput="4" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

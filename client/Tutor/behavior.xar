@@ -9330,7 +9330,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>11</language>
+                                                                        <language>13</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -9397,6 +9397,12 @@ class MyClass(GeneratedClass):
                 pass
 
     def onInput_onStart(self, sid):
+        self.converstion_dic = {}
+        self.len_order = 0
+        self.character = ''
+        self.order = []
+        self.user_log = {'student':[], 'character':[], 'student_say':[], 'character_say':[]}
+        self.now_order = 0
         self.sid = sid
         pass
 
@@ -10799,7 +10805,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>9</language>
+                                                                        <language>11</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -18777,7 +18783,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>12</language>
+                                                                        <language>14</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -26028,7 +26034,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>12</language>
+                                                                        <language>14</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -26177,6 +26183,7 @@ class MyClass(GeneratedClass):
                                             <Link inputowner="4" indexofinput="2" outputowner="0" indexofoutput="2" />
                                             <Link inputowner="5" indexofinput="2" outputowner="4" indexofoutput="3" />
                                             <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="6" />
+                                            <Link inputowner="3" indexofinput="3" outputowner="1" indexofoutput="8" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>
@@ -26485,7 +26492,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[]]>
 </chinese>
-                                                                        <language>17</language>
+                                                                        <language>19</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -26883,6 +26890,9 @@ class MyClass(GeneratedClass):
                         <Link inputowner="5" indexofinput="2" outputowner="9" indexofoutput="3" />
                         <Link inputowner="8" indexofinput="2" outputowner="0" indexofoutput="2" />
                         <Link inputowner="3" indexofinput="2" outputowner="8" indexofoutput="3" />
+                        <Link inputowner="2" indexofinput="3" outputowner="2" indexofoutput="4" />
+                        <Link inputowner="1" indexofinput="3" outputowner="1" indexofoutput="4" />
+                        <Link inputowner="4" indexofinput="3" outputowner="4" indexofoutput="4" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

@@ -10,7 +10,7 @@ u:(~hey_nao) ^gotoReactivate(Tutor)
 
 u:(~back_to_tutor) ok! let's go back to Tutor dialog $onStopped=1
 
-u:(e:Dialog/NotUnderstood) excuse me, can you repeat again? 
+u:(e:Dialog/NotUnderstood) excuse me, can you repeat again? ^gotoReactivate(Tutor)
 
 proposal: %Tutor we are in tutor dialog, you can say reading, conversation, recording or pronunciation 
     u1:(conversation) ok ! now we enter conversation. $conversation = 1

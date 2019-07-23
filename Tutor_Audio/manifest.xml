@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package uuid="tutor_audio-9bef55">
+ <names>
+  <name lang="en_US">Tutor</name>
+ </names>
+ <supportedLanguages>
+  <language>en_US</language>
+ </supportedLanguages>
+ <descriptionLanguages>
+  <language>en_US</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="Tutor_Audio">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Tutor">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

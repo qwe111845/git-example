@@ -1,0 +1,22 @@
+topic: ~Tutor_dialog()
+language: enu
+
+concept:(hey_nao)  ["hey nao" "hi nao"]
+
+concept:(back_to_tutor) ["{*} leave tutor dialog {*}" e:HandRightBackTouched e:FrontTactilTouched]
+
+
+u:(~hey_nao) ^gotoReactivate(Tutor)
+
+u:(~back_to_tutor) ok! let's go back to Tutor dialog $onStopped=1
+
+u:(e:Dialog/NotUnderstood) excuse me, can you repeat again? ^gotoReactivate(Tutor)
+
+proposal: %Tutor we are in tutor dialog, you can say reading, conversation, recording or pronunciation 
+    u1:(conversation) ok ! now we enter conversation. $conversation = 1
+    u1:(recording) ok ! now we enter recording. $recording = 1
+    u1:(reading)ok ! now we enter reading. $reading = 1
+    u1:(pronunciation) ok ! now we enter pronunciation. $word = 1
+    u:(e:Dialog/NotUnderstood) excuse me, can you repeat again? ^sameProposal
+
+

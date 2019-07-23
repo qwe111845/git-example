@@ -1160,7 +1160,7 @@ class MyClass(GeneratedClass):
 
     def onInput_onStop(self):
         if self.end:
-            self.say('離開閱讀模式', 80)
+            self.say('離開閱讀練習', 80)
             self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
             self.out_reading() #activate the output of the box
         else:
@@ -2031,25 +2031,23 @@ class MyClass(GeneratedClass):
             self.quiz_data = json.loads(data)
 
             s.close()
-            self.say('please touch my front head, to start practicing', self.reading_speed)
             self.wait_for_teacher()
         except socket.error, msg:
             self.logger.info(msg)
-            self.say('server error, please check the server first')
+            self.say('server error, please check the server first', self.reading_speed)
 
     def onInput_reading_test(self):
 
         if self.order > 3:
             self.order = 0
-            self.say('End of reading comprehension')
+            self.say('End of reading comprehension', self.reading_speed)
             self.waiting()
         elif self.order <= 3:
             self.say('Question ' + str(self.quiz_data['order'][self.order]), self.reading_speed)
             time.sleep(0.5)
             self.say(str(self.quiz_data['quiz'][self.order]), self.reading_speed)
-            time.sleep(1)
-            self.say(str(self.quiz_data['quiz'][self.order]), self.reading_speed)
             time.sleep(2)
+            self.say(str(self.quiz_data['quiz'][self.order]), self.reading_speed)
             self.order +=1
             self.wait_for_teacher()
 
@@ -2057,14 +2055,12 @@ class MyClass(GeneratedClass):
         self.say('Question ' + str(self.quiz_data['order'][self.order]), self.reading_speed)
         self.say(str(self.quiz_data['quiz'][self.order]), self.reading_speed)
         time.sleep(1)
-        self.say(str(self.quiz_data['quiz'][self.order]), self.reading_speed)
-        time.sleep(1)
         self.say('Which answer do you select?', self.reading_speed)
         self.choose()
 
     def onInput_get_answer(self, answer):
         self.answer = answer
-        self.say('OK! Please touch my front head and say your answer', 60)
+        self.say('OK! Please touch my front head and say your answer', self.reading_speed)
         self.record_answer()
 
     def onInput_next_question(self):

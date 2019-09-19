@@ -25072,15 +25072,18 @@ class MyClass(GeneratedClass):
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
-                                    <![CDATA[import time
+                                    <![CDATA[# -*- coding: utf-8 -*-
 
+import time
+import json
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self, False)
         self.animSpeech = ALProxy('ALAnimatedSpeech')
         self.change = False
         self.motion = ALProxy("ALMotion")
-
+        self.ip = '140.134.26.200'
+        self.port = 5007
     def onLoad(self):
         self.bIsRunning = False
         self.ids = []
@@ -25111,12 +25114,12 @@ class MyClass(GeneratedClass):
         time.sleep(0.5)
         self.say('準備好之後，請摸我頭的前面來開始錄音，如果提早念完，可以摸我的頭中間停止錄音')
 
-        self.startRecording(self.getParameter('id'))
+        self.startRecording([self.getParameter('id'), self.unit])
 
     def onInput_finish_record(self):
         #self.say('Please touch my front head to start recording')
         self.say('您已經完成了課程練習，現在開始做閱讀測驗', 90)
-        self.startReadingTest([self.getParameter('id'), str(self.unit)])
+        self.startReadingTest([self.getParameter('id'), self.unit])
 
     def onInput_finish_reading_test(self):
         #self.say('Please touch my front head to start recording')
@@ -25130,44 +25133,12 @@ class MyClass(GeneratedClass):
             id = p[0][0].lower().rstrip()
             #self.say('Current id is ' + self.getParameter('id'), 80)
             #self.say('Connect to server', 80)
+            self.setParameter('id', id)
             self.logger.info(id)
-            self.say('目前的帳號是 ' + self.getParameter('id'), 90)
             self.say('連接伺服器中，請稍等', 90)
             self.motion.wakeUp()
-            try:
-                port = 5007
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(('140.134.26.200', port))
-                s.send('student account')
-                s.recv(1024)
+            self.update_student_account()
 
-                time.sleep(0.5)
-                s.send(id)
-                answer = s.recv(1024)
-                units = answer.split(';')
-
-                self.logger.info(units)
-                self.unit_id = units[0]
-                self.unit = units[1]
-                self.title = units[2]
-
-                if answer == 'no account':
-                    #self.say('I don\'t have the ID information, please re-scan QR code', 80)
-                    self.say('找不到這個帳號的資料喔，請重新掃描 QR code', 90)
-                    self.change = True
-
-                else:
-                    #self.say('change to ' + id, 80)
-                    self.setParameter('id', id)
-                    #self.say('start learning unit ' + self.unit + ' ' + self.title, 80)
-                    self.say('帳號 ' + str(id) + ' 設定成功',90)
-                    s.close()
-                    if self.unit_id is '9':
-                        self.say('這是最後一個課程了喔，加油')
-                    self.word_practice()
-            except:
-                self.say('伺服器有問題，請檢查伺服器，檢查完請在掃描 QR code')
-                self.change = True
 
     def word_practice(self):
         time.sleep(1)
@@ -25176,72 +25147,25 @@ class MyClass(GeneratedClass):
         self.word(self.unit_id)
 
     def onInput_course_selection(self, command):
-        port = 5007
+        self.say('好的等我記錄一下課程，開始連接伺服器', 90)
         if command == '練習':
             if int(self.unit_id) < 9:
-                self.say('好的等我記錄一下課程，開始連接伺服器', 90)
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(('140.134.26.200', port))
-                s.send('update progress')
-                s.recv(1024)
-                id = int(self.unit_id) + 1
-                data = self.getParameter('id') + ';' + str(id)
-                s.send(data)
-                s.close()
-
+                self.update_progress()
                 time.sleep(1)
-
-                ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                ss.connect(('140.134.26.200', port))
-                ss.send('student account')
-                ss.recv(1024)
-                ids = self.getParameter('id')
-                ss.send(ids)
-                answer = ss.recv(1024)
-                units = answer.split(';')
-                self.logger.info(units)
-                self.unit_id = units[0]
-                self.unit = units[1]
-                self.title = units[2]
-                ss.close()
-                self.say('課程記錄成功，資料更新完畢', 90)
-                if self.unit_id is '9':
-                    self.say('這是最後一個課程了喔，加油')
-                self.word_practice()
-
+                self.update_student_account()
             else:
                 self.say('您已經練習完畢，不能在練習了優，掰掰')
                 self.say('謝謝您學習本課程')
-                self.setParameter('id', '000')
-                self.unit_id = ''
-                self.unit = ''
-                self.title = ''
-                self.change = True
-                self.motion.rest()
-
+                self.initialize()
 
         elif command == '離開':
             if int(self.unit_id) < 9:
-                self.say('等我記錄一下課程，開始連接伺服器', 90)
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(('140.134.26.200', port))
-                s.send('update progress')
-                s.recv(1024)
-                id = int(self.unit_id) + 1
-                data = self.getParameter('id') + ';' + str(id)
-                s.send(data)
-                s.close()
-
+                self.update_progress()
                 self.say('紀錄完畢，下次再見，掰掰', 90)
             else:
                 self.say('謝謝您學習本課程')
-            self.setParameter('id', '000')
-            self.unit_id = ''
-            self.unit = ''
-            self.title = ''
-            self.change = True
-            self.motion.rest()
 
+            self.initialize()
 
     def say(self,p, RSPD = 100 , VCT = 100):
         self.bIsRunning = True
@@ -25262,6 +25186,67 @@ class MyClass(GeneratedClass):
                 self.bIsRunning = False
         pass
 
+    def update_progress(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((self.ip, self.port))
+            s.send('update progress')
+            s.recv(1024)
+            u_id = int(self.unit_id) + 1
+            data = {'student': self.getParameter('id'), 'course': u_id}
+            s.send(json.dumps(data))
+            s.close()
+        except socket.error as msg:
+            s.close()
+            self.logger.info(msg)
+            self.say('伺服器有問題，請檢查伺服器')
+
+    def update_student_account(self):
+
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((self.ip, self.port))
+            s.send('student account')
+            s.recv(1024)
+
+            time.sleep(0.5)
+            s.send(self.getParameter('id'))
+            answer = s.recv(1024)
+
+            if answer == 'no account':
+                #self.say('I don\'t have the ID information, please re-scan QR code', 80)
+                self.say('找不到這個帳號的資料喔，請重新掃描 QR code', 90)
+                self.setParameter('id', '000')
+                self.change = True
+
+            else:
+                stu_data = json.loads(answer)
+
+                self.logger.info(stu_data)
+                self.unit_id = str(stu_data['unit_id']).encode('utf-8')
+                self.unit = str(stu_data['unit']).encode('utf-8')
+                self.title = stu_data['title'].encode('utf-8')
+                #self.say('change to ' + id, 80)
+                #self.say('start learning unit ' + self.unit + ' ' + self.title, 80)
+                self.say('帳號 ' + self.getParameter('id') + ' 設定成功',90)
+                s.close()
+                if self.unit_id is '9':
+                    self.say('這是最後一個課程了喔，加油')
+                self.word_practice()
+
+
+        except socket.error as msg:
+            self.logger.info(msg)
+            self.say('伺服器有問題，請檢查伺服器，檢查完請在掃描 QR code')
+            self.change = True
+
+    def initialize(self):
+        self.setParameter('id', '000')
+        self.unit_id = ''
+        self.unit = ''
+        self.title = ''
+        self.change = True
+        self.motion.rest()
 
     def onInput_onStop(self):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
@@ -25279,7 +25264,7 @@ class MyClass(GeneratedClass):
                             <Input name="finish_reading_test" type="1" type_size="1" nature="1" inner="0" tooltip="" id="9" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="10" />
                             <Output name="word" type="3" type_size="1" nature="2" inner="0" tooltip="" id="11" />
-                            <Output name="startRecording" type="3" type_size="1" nature="2" inner="0" tooltip="" id="12" />
+                            <Output name="startRecording" type="3" type_size="2" nature="2" inner="0" tooltip="" id="12" />
                             <Output name="startReading" type="3" type_size="1" nature="2" inner="0" tooltip="" id="13" />
                             <Output name="finish_all" type="1" type_size="1" nature="2" inner="0" tooltip="" id="14" />
                             <Output name="startReadingTest" type="3" type_size="2" nature="2" inner="0" tooltip="" id="15" />
@@ -25381,11 +25366,12 @@ class MyClass(GeneratedClass):
                                                     <content>
                                                         <![CDATA[import socket
 import time
-
+import json
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
-
+        self.ip = '140.134.26.200'
+        self.port = 5007
     def onLoad(self):
         #put initialization code here
         pass
@@ -25396,24 +25382,26 @@ class MyClass(GeneratedClass):
 
     def onInput_onStart(self,p):
         #self.onStopped() #activate the output of the box
-        port = 5007
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(('140.134.26.200', port))
+            s.connect((self.ip, self.port))
             s.send('word')
             response = s.recv(2048)
             s.send(str(p))
             time.sleep(0.5)
             data = s.recv(4096)
-            word_data = data.split(';;')
-            if word_data[len(word_data)-1] == '':
-                del word_data[len(word_data)-1]
-        finally:
-            try:
-                s.close()
-                self.onStopped(word_data) # activate output of the box
-            except:
-                pass
+            word_data = json.loads(data)
+            words = []
+            # 要把unicode轉換為type str 否則傳過去會消失
+            for word in word_data['words']:
+                words.append(word.encode('utf-8'))
+
+        except socket.error as msg:
+            s.close()
+            self.logger.info(msg)
+            self.say('伺服器有問題，請檢查伺服器')
+        s.close()
+        self.onStopped(words) # activate output of the box
 
     def onInput_onStop(self):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
@@ -25453,6 +25441,7 @@ class MyClass(GeneratedClass):
         self.say('Start practicing words', self.speech_rate)
         self.words = word_data
         self.logger.info(len(self.words))
+        self.logger.info(self.words)
         self.run = True
 
         self.start()
@@ -26223,7 +26212,7 @@ class MyClass(GeneratedClass):
                                                                         <chinese>
                                                                             <![CDATA[您已經完成了單字的練習，如果要開始閱讀練習，請摸我頭部的前面]]>
 </chinese>
-                                                                        <language>20</language>
+                                                                        <language>-1</language>
                                                                     </pluginContent>
                                                                     <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
                                                                     <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Data is sent on the output when this input is stimulated." id="2" />
@@ -27311,7 +27300,7 @@ class MyClass(GeneratedClass):
 </content>
                             </script>
                             <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                            <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStart" type="3" type_size="2" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                             <Timeline enable="0">
@@ -27525,7 +27514,8 @@ class MyClass(GeneratedClass):
         GeneratedClass.__init__(self, False)
         self.animSpeech = ALProxy('ALAnimatedSpeech')
         self.file_path = ''
-
+        self.ip = '140.134.26.200'
+        self.port = 5007
     def onLoad(self):
         self.bIsRunning = False
         self.ids = []
@@ -27544,7 +27534,8 @@ class MyClass(GeneratedClass):
 
     def onInput_onStart(self, id):
         #self.onStopped() #activate the output of the box
-        self.sid = id.lower()
+        self.sid = id[0].lower()
+        self.unit = '-unit ' + id[1]
         self.recording_time = time.strftime(" %Y-%m-%d %H\'%M", time.localtime())
 
     def onInput_file_path_get(self, file_path):
@@ -27553,7 +27544,7 @@ class MyClass(GeneratedClass):
         self.make_decisions()
 
     def onInput_transfer(self, decision):
-        port = 5007
+
         SIZE = 1024
 
         if decision == '重新錄音':
@@ -27562,40 +27553,34 @@ class MyClass(GeneratedClass):
         elif decision == '開始傳送':
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(("140.134.26.200", port))
+                s.connect((self.ip, self.port))
 
                 s.send('file')
-                print s.recv(SIZE)
+                s.recv(SIZE) # 防止Error 10054
 
-                file_name = self.sid + ';' + self.sid + self.recording_time + '-record.wav'
-
+                file_name = self.sid + ';' + self.sid + self.recording_time + self.unit + '.wav'
                 self.logger.info(file_name)
+
                 s.send(file_name)
-                print s.recv(SIZE)
+                s.recv(SIZE) # 防止Error 10054
 
                 self.say('傳送中，這需要一點時間，大約一到兩分鐘')
-                self.logger.info('sending, please wait for a second ...')
+
                 time.sleep(0.2)
                 with open(self.file_path, 'rb') as f:
                     for data in f:
                         s.send(data)
 
-                self.logger.info('sended !')
-                self.logger.info('connection closed')
 
                 self.say('傳送完畢')
+                time.sleep(0.5)
             except:
+                s.close()
                 self.say('伺服器出了點狀況，麻煩檢查伺服器')
 
-
-            finally:
-                try:
-                    s.close()
-                    self.onUnload()
-                    self.onStopped()
-                except:
-                    pass
-
+            s.close()
+            self.onUnload()
+            self.onStopped()
         else:
             self.say('我出了點問題，請重新錄音')
             self.re_record()
@@ -27625,7 +27610,7 @@ class MyClass(GeneratedClass):
 </content>
                                                 </script>
                                                 <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                                                <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStart" type="3" type_size="2" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                                                 <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                                                 <Input name="transfer" type="3" type_size="1" nature="1" inner="0" tooltip="" id="4" />
                                                 <Input name="file_path_get" type="3" type_size="1" nature="1" inner="0" tooltip="" id="5" />
@@ -28073,7 +28058,6 @@ class MyClass(GeneratedClass):
                                             </Box>
                                             <Link inputowner="3" indexofinput="2" outputowner="8" indexofoutput="4" />
                                             <Link inputowner="8" indexofinput="2" outputowner="10" indexofoutput="8" />
-                                            <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
                                             <Link inputowner="5" indexofinput="5" outputowner="3" indexofoutput="6" />
                                             <Link inputowner="1" indexofinput="2" outputowner="5" indexofoutput="7" />
                                             <Link inputowner="5" indexofinput="4" outputowner="1" indexofoutput="5" />
@@ -28084,6 +28068,7 @@ class MyClass(GeneratedClass):
                                             <Link inputowner="10" indexofinput="2" outputowner="4" indexofoutput="4" />
                                             <Link inputowner="6" indexofinput="2" outputowner="2" indexofoutput="3" />
                                             <Link inputowner="0" indexofinput="4" outputowner="6" indexofoutput="4" />
+                                            <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
                                         </Diagram>
                                     </BehaviorKeyframe>
                                 </BehaviorLayer>
@@ -28921,12 +28906,18 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
         self.animSpeech = ALProxy('ALAnimatedSpeech')
-        self.quiz_data = {}
+        self.ip = '140.134.26.200'
+        self.port = 5007
         self.speed = 75
+        self.initilize()
+
+    def initilize(self):
+        self.quiz_data = {}
         self.order = 0
         self.answer = ''
         self.stu_answer = ''
         self.stu_reading_log = {'sid' : '', 'unit': '', 'order' : [1, 2, 3, 4], 'stu_answer' : [], 'stu_read_ans' : [], 'wer' : [], 'reading_speed' : []}
+
     def onLoad(self):
         #put initialization code here
         self.bIsRunning = False
@@ -28934,11 +28925,8 @@ class MyClass(GeneratedClass):
 
     def onUnload(self):
         #put clean-up code here
-        self.quiz_data = {}
-        self.order = 0
-        self.answer = ''
-        self.stu_answer = ''
-        self.stu_reading_log = {'sid' : '', 'unit': '', 'order' : [1, 2, 3, 4], 'stu_answer' : [], 'stu_read_ans' : [],'wer' : [], 'reading_speed' : []}
+        self.initilize()
+
         for id in self.ids:
             try:
                 self.animSpeech.stop(id)
@@ -28948,12 +28936,11 @@ class MyClass(GeneratedClass):
     def onInput_onStart(self,p):
         #self.onStopped() #activate the output of the box
         import json
-        port = 5007
         self.stu_reading_log['sid'] = p[0]
         self.stu_reading_log['unit'] = p[1]
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(('140.134.26.200', port))
+            s.connect((self.ip, self.port))
             s.send('quiz')
             response = s.recv(2048)
             s.send(str(p[1]))
@@ -29039,10 +29026,8 @@ class MyClass(GeneratedClass):
 
     def sendlog(self):
         import json
-        port = 5007
-
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('140.134.26.200', port))
+        s.connect((self.ip, self.port))
         s.send('quiz_log')
         response = s.recv(2048)
         time.sleep(0.5)
@@ -29054,9 +29039,8 @@ class MyClass(GeneratedClass):
         self.say(ans)
 
     def get_wer(self, real, say):
-        port = 5007
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('140.134.26.200', port))
+        s.connect((self.ip, self.port))
         s.send('wer')
         response = s.recv(2048)
         s.send(str(real) + ';;' + say)
@@ -29341,11 +29325,11 @@ class MyClass(GeneratedClass):
                         <Link inputowner="3" indexofinput="8" outputowner="9" indexofoutput="5" />
                         <Link inputowner="9" indexofinput="3" outputowner="9" indexofoutput="5" />
                         <Link inputowner="8" indexofinput="2" outputowner="0" indexofoutput="2" />
-                        <Link inputowner="12" indexofinput="2" outputowner="3" indexofoutput="12" />
                         <Link inputowner="3" indexofinput="7" outputowner="12" indexofoutput="4" />
                         <Link inputowner="13" indexofinput="2" outputowner="3" indexofoutput="15" />
                         <Link inputowner="6" indexofinput="2" outputowner="11" indexofoutput="4" />
                         <Link inputowner="3" indexofinput="9" outputowner="13" indexofoutput="4" />
+                        <Link inputowner="12" indexofinput="2" outputowner="3" indexofoutput="12" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>
